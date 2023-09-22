@@ -75,6 +75,9 @@ class Account(AbstractBaseUser):
 
     def __str__(self):
         return self.username
+    
+    def has_module_perms(self, app_label):
+        return True
  
 
 class Patient(models.Model):
