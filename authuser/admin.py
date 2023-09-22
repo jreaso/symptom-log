@@ -1,23 +1,30 @@
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
-from django.contrib.admin import ModelAdmin
+from django.contrib.auth.admin import UserAdmin
 
 from authuser.models import Account, Patient, Clinician
 
-class AccountAdmin(ModelAdmin):
+class AccountAdmin(UserAdmin):
     list_display = ('email', 'first_name', 'last_name', 'role', 'date_joined', 'last_login', 'is_staff', 'role_info')
     search_fields = ('email', 'first_name', 'last_name')
     readonly_fields = ('id', 'date_joined', 'last_login')
 
     filter_horizontal = ()
     list_filter = ()
+    ordering = ()
+
+    fieldsets = (
+        (None, {'fields': ('first_name', 'last_name', 'email', 'role', 'password')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
+        ('Dates', {'fields': ('last_login', 'date_joined')}),
+    )
+
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'first_name', 'last_name', 'role', 'password1', 'password2'),
+            'fields': ('email', 'password1', 'password2', 'first_name', 'last_name', 'role', 'is_active', 'is_staff', 'is_superuser'),
         }),
     )
-    ordering = ()
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)

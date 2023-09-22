@@ -18,6 +18,7 @@ class AccountManager(BaseUserManager):
 
         # Create associated Patient or Clinician object based on the role
         if role.lower() == 'patient':
+            #Patient.objects.create(user=user, dob=user.dob, sex=user.sex)
             Patient.objects.create(user=user, dob=extra_fields.get('dob'), sex=extra_fields.get('sex'))
         elif role.lower() == 'clinician':
             Clinician.objects.create(user=user)
@@ -70,7 +71,7 @@ class Account(AbstractBaseUser):
     REQUIRED_FIELDS = ["role"]
 
     def __str__(self):
-        return self.email
+        return f"{self.first_name} {self.last_name}"
     
     def has_perm(self, perm, obj=None):
         return self.role == 'admin'
