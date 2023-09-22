@@ -1,33 +1,30 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 
 class AccountManager(BaseUserManager):
-    def create_user(self, email, username, password=None, role='patient', **extra_fields):
+    def create_user(self, email, password=None, role='patient', **extra_fields):
         if not email:
             raise ValueError("Users must have an email address.")
-        if not username:
-            raise ValueError("Users must have a username.")
         
         if role == 'admin':
             extra_fields.setdefault("is_staff", True)
         
         user = self.model(
             email = self.normalize_email(email),
-            username = username,
             **extra_fields
         )
         user.set_password(password)
         user.save(using=self._db)
 
         # Create associated Patient or Clinician object based on the role
-        if role == 'patient':
+        if role.lower() == 'patient':
             Patient.objects.create(user=user, dob=extra_fields.get('dob'), sex=extra_fields.get('sex'))
-        elif role == 'clinician':
+        elif role.lower() == 'clinician':
             Clinician.objects.create(user=user)
         
         return user
     
-    def create_superuser(self, email, username, password, **extra_fields):
+    def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault("role", 'admin')
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
@@ -41,7 +38,6 @@ class AccountManager(BaseUserManager):
 
         user = self.model(
             email = self.normalize_email(email),
-            username = username,
             **extra_fields
         )
         user.set_password(password)
@@ -50,7 +46,7 @@ class AccountManager(BaseUserManager):
 
 class Account(AbstractBaseUser):
     email = models.EmailField(verbose_name="email", max_length=60, unique=True)
-    username = models.CharField(verbose_name="username", max_length=30, unique=True)
+    #username = models.CharField(verbose_name="username", max_length=30, unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
 
@@ -71,10 +67,10 @@ class Account(AbstractBaseUser):
     objects = AccountManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["username", "first_name", "last_name"]
+    REQUIRED_FIELDS = ["role"]
 
     def __str__(self):
-        return self.username
+        return self.email
     
     def has_perm(self, perm, obj=None):
         return self.role == 'admin'
