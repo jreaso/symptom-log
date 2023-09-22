@@ -1,0 +1,43 @@
+{% extends "core/base_minimal.html" %}
+
+{% block title %}Log In{% endblock %}
+
+{% block main_content %}
+    <div class="container-fluid flex-grow-1">
+        <div class="row h-100">
+            <!-- Right panel -->
+            <div class="col-md-6 order-md-2 d-flex flex-column justify-content-center align-items-center bg-primary text-light text-left" style="min-height: 100vh; height: 100%;">
+                <h1 class="fw-bold display-2">Symptom Log</h1>
+                <div class="lead fs-3 font-monospace mt-4 col-8">
+                    <p>Symptom Log allows patients to log how they feel and track symptom progression, providing valuable insights to doctors and carers.</p>
+                </div>
+                <!-- Footer-->
+                <footer class="text-light text-center py-4">
+                    {% include 'core/footer.html' %}
+                </footer>
+            </div>
+
+            <!-- Left panel - Login Form -->
+            <div class="col-md-6 order-md-1 d-flex flex-column justify-content-center align-items-center p-4" style="min-height: 100vh; height: 100%;">
+                <h2 class="text-center display-3 fw-bold pb-3">Login</h2>
+                {% if message %}
+                <p class="text-danger">{{ message }}</p>
+                {% endif %}
+                <form class="w-50" action="{% url 'login' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <input type="text" name="username" class="form-control form-control-lg" id="username" placeholder="Username">
+                    </div>
+                    <div class="form-group mb-3">
+                        <input type="password" name="password" class="form-control form-control-lg" id="password" placeholder="Password">
+                    </div>
+                    <!-- Add justify-content-end class to the button's parent div -->
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" value="Login" class="btn btn-primary btn-lg">Log In</button>
+                    </div>
+                </form>
+                <p class="text-muted pt-4 text-center">Please login with provided credentials.<br>Contact admin for support.</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
