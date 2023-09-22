@@ -22,7 +22,7 @@ class AccountAdmin(UserAdmin):
             return f"DOB: {obj.patient.dob}, Sex: {obj.patient.sex}"
         elif obj.role == 'clinician' and hasattr(obj, 'clinician'):
             return f"Patients: {', '.join([str(patient) for patient in obj.clinician.patients.all()])}"
-        return "Admin - No Info"
+        return "No Info"
 
     role_info.short_description = "Role Info"
 
