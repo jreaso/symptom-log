@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
-class CustomUserManager(BaseUserManager):
+class AccountManager(BaseUserManager):
     def create_user(self, email, username, password=None, role='patient', **extra_fields):
         if not email:
             raise ValueError("Users must have an email address.")
@@ -10,7 +10,6 @@ class CustomUserManager(BaseUserManager):
         
         if role == 'admin':
             extra_fields.setdefault("is_staff", True)
-
         
         user = self.model(
             email = self.normalize_email(email),
@@ -49,7 +48,7 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-class CustomUser(AbstractBaseUser):
+class Account(AbstractBaseUser):
     email = models.EmailField(verbose_name="email", max_length=60, unique=True)
     username = models.CharField(verbose_name="username", max_length=30, unique=True)
     first_name = models.CharField(max_length=30)
@@ -69,22 +68,22 @@ class CustomUser(AbstractBaseUser):
 
     role = models.CharField(max_length=10, choices=Role.choices)
 
-    objects = CustomUserManager()
+    objects = AccountManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["email", "username", "first_name", "last_name"]
+    REQUIRED_FIELDS = ["username", "first_name", "last_name"]
 
     def __str__(self):
         return self.username
  
 
 class Patient(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
+    user = models.OneToOneField(Account, on_delete=models.CASCADE, primary_key=True)
     #patient_id = models.IntegerField(null=True, blank=True)
     dob = models.DateField()
     sex = models.CharField(max_length=10, choices=(('male', 'Male'), ('female', 'Female'), ('other', 'Other')))
 
 class Clinician(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(Account, on_delete=models.CASCADE)
     patients = models.ManyToManyField(Patient, related_name='clinicians')
 
