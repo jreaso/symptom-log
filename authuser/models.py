@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class AccountManager(BaseUserManager):
     def create_user(self, email, password=None, role='patient', **extra_fields):
@@ -15,13 +17,6 @@ class AccountManager(BaseUserManager):
         )
         user.set_password(password)
         user.save(using=self._db)
-
-        # Create associated Patient or Clinician object based on the role
-        if role.lower() == 'patient':
-            #Patient.objects.create(user=user, dob=user.dob, sex=user.sex)
-            Patient.objects.create(user=user, dob=extra_fields.get('dob'), sex=extra_fields.get('sex'))
-        elif role.lower() == 'clinician':
-            Clinician.objects.create(user=user)
         
         return user
     
@@ -72,7 +67,7 @@ class Account(AbstractBaseUser):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
-    
+
     def has_perm(self, perm, obj=None):
         return self.role == 'admin'
     
@@ -83,10 +78,25 @@ class Account(AbstractBaseUser):
 class Patient(models.Model):
     user = models.OneToOneField(Account, on_delete=models.CASCADE, primary_key=True)
     #patient_id = models.IntegerField(null=True, blank=True)
-    dob = models.DateField()
-    sex = models.CharField(max_length=10, choices=(('male', 'Male'), ('female', 'Female'), ('other', 'Other')))
+    dob = models.DateField(null=True, blank=True)
+    sex = models.CharField(max_length=10, choices=(('male', 'Male'), ('female', 'Female'), ('other', 'Other')), null=True, blank=True)
+
 
 class Clinician(models.Model):
     user = models.OneToOneField(Account, on_delete=models.CASCADE)
-    patients = models.ManyToManyField(Patient, related_name='clinicians')
+    patients = models.ManyToManyField(Patient, related_name='clinicians', null=True, blank=True)
 
+
+@receiver(post_save, sender=Account)
+def create_user_role_model(sender, instance, created, **kwargs):
+    if created:
+        if instance.role.lower() == 'patient':
+            # Check if dob and sex exist in instance, otherwise use None
+            dob = getattr(instance, 'dob', None)
+            sex = getattr(instance, 'sex', None)
+            Patient.objects.create(user=instance, dob=dob, sex=sex)
+        elif instance.role.lower() == 'clinician':
+            patients = getattr(instance, 'patients', None)
+            clinician = Clinician.objects.create(user=instance)
+            if patients is not None:
+                clinician.patients.set(patients)
