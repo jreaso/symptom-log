@@ -84,7 +84,7 @@ class Patient(models.Model):
 
 class Clinician(models.Model):
     user = models.OneToOneField(Account, on_delete=models.CASCADE)
-    patients = models.ManyToManyField(Patient, related_name='clinicians', null=True, blank=True)
+    patients = models.ManyToManyField(Patient, related_name='clinicians', blank=True)
 
 
 @receiver(post_save, sender=Account)
