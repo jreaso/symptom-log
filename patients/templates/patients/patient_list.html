@@ -1,0 +1,10 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+  <h1>List of Patients</h1>
+  <ul>
+    {% for patient in patients %}
+      <li>{{ patient.user.first_name }} {{ patient.user.last_name }}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}
