@@ -13,9 +13,6 @@ class Question(models.Model):
         if self.label:
             return self.label
         return self.question_title
-    
-    class Meta:
-        abstract = True
 
 
 class SymptomScoreQuestion(Question):
@@ -73,8 +70,8 @@ class Form(models.Model):
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=255)
     patient = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='forms')
-    
-    questions = GenericRelation('Question')
+
+    questions = models.ManyToManyField(Question, related_name='forms')
 
     date_created = models.DateTimeField(auto_now_add=True)
     last_edited = models.DateTimeField(auto_now=True)

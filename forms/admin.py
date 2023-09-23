@@ -1,9 +1,15 @@
 from django.contrib import admin
-from .models import SymptomScoreQuestion, SymptomScoreResponse, TextQuestion, TextResponse, \
-    MultipleChoiceQuestion, MultipleChoiceResponse, StatusQuestion, StatusResponse, \
-    EventQuestion, EventResponse, Form, FormResponse
+from .models import (
+    Question,
+    SymptomScoreQuestion, SymptomScoreResponse, 
+    TextQuestion, TextResponse,
+    MultipleChoiceQuestion, MultipleChoiceResponse,
+    StatusQuestion, StatusResponse,
+    EventQuestion, EventResponse, 
+    Form, FormResponse
+)
 
-
+admin.site.register(Question)
 admin.site.register(SymptomScoreQuestion)
 admin.site.register(SymptomScoreResponse)
 admin.site.register(TextQuestion)
