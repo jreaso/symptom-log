@@ -16,27 +16,25 @@ def login_view(request):
         # If user object is returned, log in and route to index page:
         if user:
             login(request, user)
-            #return HttpResponseRedirect(reverse("dashboard"))
+            # return HttpResponseRedirect(reverse("dashboard"))
             return HttpResponse("Logged In")
         # Otherwise, return login page again with new context
         else:
-            return render(request, "authuser/login.html", {
-                "title": "Login",
-                "message": "Invalid Credentials"
-            })
+            return render(
+                request,
+                "authuser/login.html",
+                {"title": "Login", "message": "Invalid Credentials"},
+            )
     else:
         # Check if user is already logged in
         if request.user.is_authenticated:
             return HttpResponse("Logged In")
         else:
-            return render(request, "authuser/login.html", {
-                "title": "Login"
-            })
+            return render(request, "authuser/login.html", {"title": "Login"})
 
 
 def logout_view(request):
     logout(request)
-    return render(request, "authuser/login.html", {
-                "title": "Logout",
-                "message": "Logged Out"
-            })
+    return render(
+        request, "authuser/login.html", {"title": "Logout", "message": "Logged Out"}
+    )
