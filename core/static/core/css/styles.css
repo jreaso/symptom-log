@@ -8,3 +8,15 @@ body {
 .content-container {
     flex: 1; /* Allow the content to grow and push the footer down */
 }
+
+.custom-mono-link {
+    font-family: monospace;
+    color: #888 !important; /* Light grey color */
+    text-decoration: none !important; /* Remove default underline */
+    transition: text-decoration 0.3s ease; /* Smooth underline transition */
+}
+  
+  /* Add underline on hover */
+.custom-mono-link:hover {
+    text-decoration: underline;
+}
