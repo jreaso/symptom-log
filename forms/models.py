@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericRelation
 from authuser.models import Account
 
 
@@ -38,7 +39,7 @@ class TextResponse(models.Model):
 
 
 class MultipleChoiceQuestion(Question):
-    options = models.CharField(null=True, blank=True)  # Store options as a comma-separated text
+    options = models.CharField(max_length=255, null=True, blank=True)  # Store options as a comma-separated text
 
 class MultipleChoiceResponse(models.Model):
     choice = models.CharField(max_length=255)
@@ -72,7 +73,8 @@ class Form(models.Model):
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=255)
     patient = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='forms')
-    questions = models.ManyToManyField(Question)
+    
+    questions = GenericRelation('Question')
 
     date_created = models.DateTimeField(auto_now_add=True)
     last_edited = models.DateTimeField(auto_now=True)
@@ -85,9 +87,9 @@ class FormResponse(models.Model):
     form = models.ForeignKey(Form, on_delete=models.CASCADE, related_name='responses')
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='responses')
     
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
-    value = GenericForeignKey('content_type', 'object_id')
+    question_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    question_object_id = models.PositiveIntegerField()
+    question = GenericForeignKey('question_content_type', 'question_object_id')
 
     submitted_at = models.DateTimeField(auto_now_add=True)
     submitted_by = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, related_name='submitted_responses')
