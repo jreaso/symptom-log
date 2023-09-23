@@ -1,7 +1,4 @@
 from django.db import models
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericRelation
 from authuser.models import Account
 
 
@@ -72,7 +69,7 @@ class StatusResponse(Response):
 class EventQuestion(Question):
     pass
 
-class EventResponse(Responsel):
+class EventResponse(Response):
     question = models.ForeignKey(EventQuestion, on_delete=models.CASCADE, related_name='responses')
     event_datetime = models.DateTimeField()
 
