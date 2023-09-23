@@ -25,16 +25,16 @@ AUTHENTICATION_BACKENDS = (
 # Application definition
 
 INSTALLED_APPS = [
-    "core",
-    "authuser",
-    "forms",
-    "patients",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "core",
+    "authuser",
+    "forms",
+    "patients",
 ]
 
 MIDDLEWARE = [
