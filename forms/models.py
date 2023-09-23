@@ -19,6 +19,7 @@ class Form(models.Model):
 
 class Question(models.Model):
     question_title = models.CharField(max_length=50)
+    label = models.CharField(max_length=30, null=True, blank=True)  # How this question should be labelled on graphs etc
 
     class QuestionType(models.TextChoices):
         SYMPTOM_SCORE = "symptom_score", "Symptom Score"  # 1-10 score
@@ -30,12 +31,14 @@ class Question(models.Model):
     question_type = models.CharField(max_length=15, choices=QuestionType.choices)
 
     def __str__(self):
+        if self.label:
+            return self.label
         return self.question_title
 
 
 class MultipleChoiceQuestion(models.Model):
     question = models.OneToOneField(Question, on_delete=models.CASCADE)
-    options = models.TextField(null=True, blank=True)  # Store options as a comma-separated text
+    options = models.CharField(null=True, blank=True)  # Store options as a comma-separated text
 
     def __str__(self):
         return f"{self.question}, Options"
