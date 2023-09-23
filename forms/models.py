@@ -30,7 +30,7 @@ class Response(models.Model):
     submitted_by = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, related_name='submitted_responses')
 
     def __str__(self):
-        return f"{self.question} ({self.date_submitted})"
+        return f"{self.question} ({self.submitted_at})"
 
 
 class SymptomScoreQuestion(Question):
