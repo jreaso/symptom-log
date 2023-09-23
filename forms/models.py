@@ -71,7 +71,7 @@ class EventResponse(models.Model):
 class Form(models.Model):
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=255)
-    patient = models.ForeignKey(Account, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='forms')
     questions = models.ManyToManyField(Question)
 
     date_created = models.DateTimeField(auto_now_add=True)
@@ -82,15 +82,15 @@ class Form(models.Model):
 
 
 class FormResponse(models.Model):
-    form = models.ForeignKey(Form, on_delete=models.CASCADE)
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    form = models.ForeignKey(Form, on_delete=models.CASCADE, related_name='responses')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='responses')
     
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     value = GenericForeignKey('content_type', 'object_id')
 
     submitted_at = models.DateTimeField(auto_now_add=True)
-    submitted_by = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
+    submitted_by = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, related_name='submitted_responses')
 
     def __str__(self):
         return f"{self.form} ({self.date_submitted})"
