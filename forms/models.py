@@ -8,7 +8,7 @@ class Form(models.Model):
     patient = models.OneToOneField(Account, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=255)
-    questions = models.ManyToManyField("Question")
+    questions = models.ManyToManyField("Question", blank=True)
 
     date_created = models.DateTimeField(auto_now_add=True)
     last_edited = models.DateTimeField(auto_now=True)
@@ -27,30 +27,30 @@ class Question(models.Model):
         STATUS = "status", "Status"  # Status e.g. On/Off
         EVENT = "event", "Event"  # Date and activity e.g. Back Physio
 
-    question_type = models.CharField(max_length=14, choices=QuestionType.choices)
+    question_type = models.CharField(max_length=15, choices=QuestionType.choices)
 
 
 class MultipleChoiceQuestion(models.Model):
     question = models.OneToOneField(Question, on_delete=models.CASCADE)
-    options = models.TextField()  # Store options as a comma-separated text
+    options = models.TextField(null=True, blank=True)  # Store options as a comma-separated text
 
 
 class StatusQuestion(models.Model):
     question = models.OneToOneField(Question, on_delete=models.CASCADE)
-    option_0 = models.CharField(max_length=10, default="Off")  # Label for False/Off/0
-    option_1 = models.CharField(max_length=10, default="On")  # Label for True/On/1
+    option_0 = models.CharField(max_length=10, null=True, blank=True)  # Label for False/Off/0 etc
+    option_1 = models.CharField(max_length=10, null=True, blank=True)  # Label for True/On/1 etc
 
 
 class EventQuestion(models.Model):
     question = models.OneToOneField(Question, on_delete=models.CASCADE)
-    event = models.CharField(max_length=255)
-    date = models.DateTimeField()
+    event = models.CharField(max_length=255, null=True, blank=True)
+    date = models.DateTimeField(null=True, blank=True)
 
 
 class FormResponse(models.Model):
     form = models.ForeignKey(Form, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    patient = models.ForeignKey(Account, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='form_response_patient')
 
     response_symptom_score = models.IntegerField(null=True, blank=True)
     response_multiple_choice_option = models.CharField(
@@ -60,7 +60,7 @@ class FormResponse(models.Model):
     response_status = models.BooleanField(null=True, blank=True)
 
     date_submitted = models.DateTimeField(auto_now_add=True)
-    submitted_by = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
+    submitted_by = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, related_name='form_response_submitted_by')
 
     def __str__(self):
         return f"{self.patient} - {self.form} ({self.date_submitted})"
