@@ -29,10 +29,16 @@ class Question(models.Model):
 
     question_type = models.CharField(max_length=15, choices=QuestionType.choices)
 
+    def __str__(self):
+        return self.question_title
+
 
 class MultipleChoiceQuestion(models.Model):
     question = models.OneToOneField(Question, on_delete=models.CASCADE)
     options = models.TextField(null=True, blank=True)  # Store options as a comma-separated text
+
+    def __str__(self):
+        return f"{self.question}, Options"
 
 
 class StatusQuestion(models.Model):
@@ -40,11 +46,16 @@ class StatusQuestion(models.Model):
     option_0 = models.CharField(max_length=10, null=True, blank=True)  # Label for False/Off/0 etc
     option_1 = models.CharField(max_length=10, null=True, blank=True)  # Label for True/On/1 etc
 
+    def __str__(self):
+        return f"{self.question}, Options"
+
 
 class EventQuestion(models.Model):
     question = models.OneToOneField(Question, on_delete=models.CASCADE)
     event = models.CharField(max_length=255, null=True, blank=True)
-    date = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.event}"
 
 
 class FormResponse(models.Model):
@@ -56,8 +67,10 @@ class FormResponse(models.Model):
     response_multiple_choice_option = models.CharField(
         max_length=255, null=True, blank=True
     )
-    response_text = models.CharField(max_length=255, null=True, blank=True)
+    response_text = models.TextField(null=True, blank=True)
     response_status = models.BooleanField(null=True, blank=True)
+    response_event = models.CharField(max_length=255, null=True, blank=True)
+    response_event_datetime = models.DateTimeField(null=True, blank=True)
 
     date_submitted = models.DateTimeField(auto_now_add=True)
     submitted_by = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, related_name='form_response_submitted_by')
@@ -85,5 +98,4 @@ def create_question_type(sender, instance, created, **kwargs):
         elif instance.question_type == Question.QuestionType.EVENT:
             # Check if event and date exist in instance, otherwise use None
             event = getattr(instance, "event", None)
-            date = getattr(instance, "date", None)
-            EventQuestion.objects.create(question=instance, event=event, date=date)
+            EventQuestion.objects.create(question=instance, event=event)
