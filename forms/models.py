@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 from authuser.models import Account
 
 
@@ -38,7 +39,9 @@ class SymptomScoreQuestion(Question):
 
 class SymptomScoreResponse(Response):
     question = models.ForeignKey(SymptomScoreQuestion, on_delete=models.CASCADE, related_name='responses')
-    score = models.PositiveIntegerField()
+    score = models.PositiveIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(10)]
+    )
 
 
 class TextQuestion(Question):
