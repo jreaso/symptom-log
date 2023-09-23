@@ -25,6 +25,7 @@ AUTHENTICATION_BACKENDS = (
 # Application definition
 
 INSTALLED_APPS = [
+    "core",
     "authuser",
     "django.contrib.admin",
     "django.contrib.auth",
