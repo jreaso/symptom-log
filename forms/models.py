@@ -3,17 +3,19 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from authuser.models import Account
 
+
 class Form(models.Model):
     patient = models.OneToOneField(Account, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=255)
-    questions = models.ManyToManyField('Question')
+    questions = models.ManyToManyField("Question")
 
     date_created = models.DateTimeField(auto_now_add=True)
     last_edited = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return self.title
+
 
 class Question(models.Model):
     question_title = models.CharField(max_length=50)
@@ -27,19 +29,23 @@ class Question(models.Model):
 
     question_type = models.CharField(max_length=14, choices=QuestionType.choices)
 
+
 class MultipleChoiceQuestion(models.Model):
     question = models.OneToOneField(Question, on_delete=models.CASCADE)
     options = models.TextField()  # Store options as a comma-separated text
+
 
 class StatusQuestion(models.Model):
     question = models.OneToOneField(Question, on_delete=models.CASCADE)
     option_0 = models.CharField(max_length=10, default="Off")  # Label for False/Off/0
     option_1 = models.CharField(max_length=10, default="On")  # Label for True/On/1
 
+
 class EventQuestion(models.Model):
     question = models.OneToOneField(Question, on_delete=models.CASCADE)
     event = models.CharField(max_length=255)
     date = models.DateTimeField()
+
 
 class FormResponse(models.Model):
     form = models.ForeignKey(Form, on_delete=models.CASCADE)
@@ -47,7 +53,9 @@ class FormResponse(models.Model):
     patient = models.ForeignKey(Account, on_delete=models.CASCADE)
 
     response_symptom_score = models.IntegerField(null=True, blank=True)
-    response_multiple_choice_option = models.CharField(max_length=255, null=True, blank=True)
+    response_multiple_choice_option = models.CharField(
+        max_length=255, null=True, blank=True
+    )
     response_text = models.CharField(max_length=255, null=True, blank=True)
     response_status = models.BooleanField(null=True, blank=True)
 
@@ -56,7 +64,7 @@ class FormResponse(models.Model):
 
     def __str__(self):
         return f"{self.patient} - {self.form} ({self.date_submitted})"
-    
+
 
 @receiver(post_save, sender=Question)
 def create_question_type(sender, instance, created, **kwargs):
@@ -70,7 +78,9 @@ def create_question_type(sender, instance, created, **kwargs):
             # Check if option_0 and option_1 exist in instance, otherwise use None
             option_0 = getattr(instance, "option_0", None)
             option_1 = getattr(instance, "option_1", None)
-            StatusQuestion.objects.create(question=instance, option_0=option_0, option_1=option_1)
+            StatusQuestion.objects.create(
+                question=instance, option_0=option_0, option_1=option_1
+            )
 
         elif instance.question_type == Question.QuestionType.EVENT:
             # Check if event and date exist in instance, otherwise use None
