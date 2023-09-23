@@ -93,12 +93,12 @@ class Clinician(models.Model):
 @receiver(post_save, sender=Account)
 def create_user_role_model(sender, instance, created, **kwargs):
     if created:
-        if instance.role.lower() == "patient":
+        if instance.role.lower() == Account.Role.PATIENT:
             # Check if dob and sex exist in instance, otherwise use None
             dob = getattr(instance, "dob", None)
             sex = getattr(instance, "sex", None)
             Patient.objects.create(user=instance, dob=dob, sex=sex)
-        elif instance.role.lower() == "clinician":
+        elif instance.role.lower() == Account.Role.CLINICIAN:
             patients = getattr(instance, "patients", None)
             clinician = Clinician.objects.create(user=instance)
             if patients is not None:
