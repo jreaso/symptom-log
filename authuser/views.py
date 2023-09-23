@@ -21,6 +21,7 @@ def login_view(request):
         # Otherwise, return login page again with new context
         else:
             return render(request, "authuser/login.html", {
+                "title": "Login",
                 "message": "Invalid Credentials"
             })
     else:
@@ -28,11 +29,14 @@ def login_view(request):
         if request.user.is_authenticated:
             return HttpResponse("Logged In")
         else:
-            return render(request, "authuser/login.html")
+            return render(request, "authuser/login.html", {
+                "title": "Login"
+            })
 
 
 def logout_view(request):
     logout(request)
     return render(request, "authuser/login.html", {
+                "title": "Logout",
                 "message": "Logged Out"
             })
