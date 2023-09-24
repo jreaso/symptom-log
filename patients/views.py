@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, HttpResponse
 from django.core.exceptions import PermissionDenied
-from authuser.models import Patient, Account
+from authuser.models import Account, Patient, Clinician
 
 
 @login_required
@@ -19,8 +19,17 @@ def patients_list(request):
 
 @login_required
 def patient_details(request, pk):
+    # get patient object
     patient = get_object_or_404(Patient, pk=pk)
-    # Add any additional context data you need for the detail view
-    #context = {'patient': patient}
-    return HttpResponse("Patient Details Page")
-    #return render(request, 'patients/patient_detail.html', context)
+
+    if request.user.role == Account.Role.ADMIN:
+        return render(request, "patients/patient_details.html", {"patient": patient})
+    elif request.user.role == Account.Role.CLINICIAN:
+        clinician = request.user.clinician
+        if patient in clinician.patients.all():
+            #return HttpResponse("Patient Page")
+            return render(request, "patients/patient_details.html", {"patient": patient})
+        else:
+            return HttpResponse("Patient Is Not Registered With You")
+    else:
+        raise PermissionDenied
