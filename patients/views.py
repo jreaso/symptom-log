@@ -21,14 +21,17 @@ def patients_list(request):
 def patient_details(request, pk):
     # get patient object
     patient = get_object_or_404(Patient, pk=pk)
+    patient_forms = patient.user.forms.all()
+
+    context = {'patient': patient, 'patient_forms': patient_forms}
 
     if request.user.role == Account.Role.ADMIN:
-        return render(request, "patients/patient_details.html", {"patient": patient})
+        return render(request, "patients/patient_details.html", context)
     elif request.user.role == Account.Role.CLINICIAN:
         clinician = request.user.clinician
         if patient in clinician.patients.all():
             #return HttpResponse("Patient Page")
-            return render(request, "patients/patient_details.html", {"patient": patient})
+            return render(request, "patients/patient_details.html", context)
         else:
             return HttpResponse("Patient Is Not Registered With You")
     else:

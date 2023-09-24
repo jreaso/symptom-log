@@ -17,7 +17,7 @@
       {% endfor %}
     </p>
 
-    {% include 'forms/forms_list.html' %}
+    {% include 'forms/forms_list.html' with patient=patient patient_forms=patient_forms %}
 
   </div>
 {% endblock %}

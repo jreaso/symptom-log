@@ -1,9 +1,13 @@
+<h1>Forms</h1>
 
-<div class="card">
+{% for form in patient_forms %}
+<div class="card my-3">
     <div class="card-body">
-      <h5 class="card-title"><a href="#">Form Title</a></h5>
-      <h6 class="card-subtitle mb-2 text-muted">Patient Name</h6>
-      <p class="card-text"><b>Last Submission:</b> DateTime<br>
-        <b>Number of Submissions:</b> Int</p>
+      <h5 class="card-title"><a href="#">{{ form.title}}</a></h5>
+      <h6 class="card-subtitle mb-2 text-muted">{{ form.patient }}</h6>
+      <p class="card-text"><b>Number of Questions:</b> {{ form.questions.count }}</p>
     </div>
 </div>
+{% empty %}
+    <p class="text-danger text-center">No Forms Found</p>
+{% endfor %}
