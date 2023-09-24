@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     Form,
-    Question, Response,
+    Question, FormResponse, Response,
     SymptomScoreQuestion, SymptomScoreResponse, 
     TextQuestion, TextResponse,
     MultipleChoiceQuestion, MultipleChoiceResponse,
@@ -12,6 +12,7 @@ from .models import (
 
 admin.site.register(Form)
 admin.site.register(Question)
+admin.site.register(FormResponse)
 admin.site.register(Response)
 admin.site.register(SymptomScoreQuestion)
 admin.site.register(SymptomScoreResponse)
