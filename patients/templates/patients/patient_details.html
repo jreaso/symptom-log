@@ -1,0 +1,20 @@
+{% extends "core/base.html" %}
+
+{% block title %}Patient Details - {{ patient }}{% endblock %}
+
+{% block content %}
+  <div class="container my-5">
+    <div>
+      <h1 class="display-4 fw-bold">Patient - {{ patient }}</h1>
+    </div>
+
+    <p>
+      <b>Date of Birth:</b> {{ patient.dob }} <br>
+      <b>Sex:</b> {{ patient.get_sex_display }} <br>
+      <b>Clinicians:</b> 
+      {% for clinician in patient.clinicians.all %}
+        {{ clinician }}{% if not forloop.last %},{% endif %} 
+      {% endfor %}
+    </p>
+  </div>
+{% endblock %}
