@@ -20,6 +20,18 @@ class Question(models.Model):
     label = models.CharField(max_length=30, null=True, blank=True)  # How this question should be labelled on graphs etc
     form = models.ForeignKey(Form, on_delete=models.CASCADE, related_name='questions')
 
+    order = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
+    
+    def save(self, *args, **kwargs):
+        # Automatically assign the order when saving a new question
+        if not self.order:
+            last_question = Question.objects.filter(form=self.form).order_by('-order').first()
+            if last_question:
+                self.order = last_question.order + 1
+            else:
+                self.order = 1
+        super(Question, self).save(*args, **kwargs)
+
     def __str__(self):
         if self.label:
             return self.label
