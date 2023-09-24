@@ -16,5 +16,8 @@
         {{ clinician }}{% if not forloop.last %},{% endif %} 
       {% endfor %}
     </p>
+
+    {% include 'forms/forms_list.html' %}
+
   </div>
 {% endblock %}
