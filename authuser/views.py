@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from .models import Account
@@ -38,8 +38,10 @@ def login_view(request):
         # If user object is returned, log in and route to index page:
         if user is not None:
             login(request, user)
-            # return HttpResponseRedirect(reverse("dashboard"))
-            return HttpResponse("Logged In")
+            if user.role in (Account.Role.ADMIN, Account.Role.CLINICIAN):
+                return redirect('patients_list')
+            elif user.role == Account.Role.PATIENT:
+                return HttpResponse("Logged In")
         # Otherwise, return login page again with new context
         else:
             return render(
