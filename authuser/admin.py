@@ -7,6 +7,7 @@ from authuser.models import Account, Patient, Clinician
 
 class AccountAdmin(UserAdmin):
     list_display = (
+        "id",
         "email",
         "first_name",
         "last_name",
@@ -24,7 +25,7 @@ class AccountAdmin(UserAdmin):
     ordering = ()
 
     fieldsets = (
-        (None, {"fields": ("first_name", "last_name", "email", "role", "password")}),
+        (None, {"fields": ("first_name", "last_name", "email", "role", "password", "id")}),
         ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser")}),
         ("Dates", {"fields": ("last_login", "date_joined")}),
     )
