@@ -6,12 +6,12 @@ from django.db.models.signals import post_save
 
 
 def generate_id():
-        while True:
-            random_uuid = str(uuid.uuid4()).replace("-", "")
-            new_id = random_uuid[:8]
+    while True:
+        random_uuid = str(uuid.uuid4()).replace("-", "")
+        new_id = random_uuid[:8]
 
-            if not Account.objects.filter(id=new_id).exists():
-                return new_id
+        if not Account.objects.filter(id=new_id).exists():
+            return new_id
             
 
 class AccountManager(BaseUserManager):
