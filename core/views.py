@@ -5,7 +5,7 @@ from authuser.models import Account
 def index(request):
     # Check if the user is not logged in
     if not request.user.is_authenticated:
-        return redirect('login_view')
+        return redirect('login')
 
     if request.user.role in (Account.Role.ADMIN, Account.Role.CLINICIAN):
         return redirect('patients_list')
