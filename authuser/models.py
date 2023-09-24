@@ -1,7 +1,8 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+import uuid
 from django.db import models
-from django.db.models.signals import post_save
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 
 class AccountManager(BaseUserManager):
@@ -38,7 +39,8 @@ class AccountManager(BaseUserManager):
 
 class Account(AbstractBaseUser):
     email = models.EmailField(verbose_name="email", max_length=60, unique=True)
-    # username = models.CharField(verbose_name="username", max_length=30, unique=True)
+    id = models.CharField(max_length=8, unique=True, editable=False)
+
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
 
@@ -46,9 +48,7 @@ class Account(AbstractBaseUser):
     last_login = models.DateTimeField(verbose_name="last login", auto_now=True)
 
     is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(
-        default=False
-    )  # Necessary when using AbstractBaseUser but not used
+    is_staff = models.BooleanField(default=False)  # Necessary when using AbstractBaseUser but not used
     is_superuser = models.BooleanField(default=False)
 
     class Role(models.TextChoices):
@@ -71,11 +71,24 @@ class Account(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return True
+    
+    def _generate_id():
+        while True:
+            random_uuid = str(uuid.uuid4()).replace("-", "")
+            new_id = random_uuid[:8]
+            
+            if not Account.objects.filter(id=new_id).exists():
+                return new_id
+    
+    def save(self, *args, **kwargs):
+        if not self.patient_id:
+            self.patient_id = self._generate_id()
+        super(Patient, self).save(*args, **kwargs)
 
 
 class Patient(models.Model):
     user = models.OneToOneField(Account, on_delete=models.CASCADE, primary_key=True)
-    # patient_id = models.IntegerField(null=True, blank=True)
+
     dob = models.DateField(null=True, blank=True)
     sex = models.CharField(
         max_length=10,
