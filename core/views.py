@@ -13,4 +13,4 @@ def index(request):
     elif request.user.role == Account.Role.PATIENT:
         return HttpResponse("Patient Logged In")
     
-    return HttpResponse("Error: User does not have a role.")
+    return HttpResponse("Error: User does not have a role. Contact Admin.")
