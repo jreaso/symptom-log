@@ -98,10 +98,16 @@ class Patient(models.Model):
         blank=True,
     )
 
+    def __str__(self):
+        return str(self.user)
+
 
 class Clinician(models.Model):
     user = models.OneToOneField(Account, on_delete=models.CASCADE)
     patients = models.ManyToManyField(Patient, related_name="clinicians", blank=True)
+
+    def __str__(self):
+        return str(self.user)
 
 
 @receiver(post_save, sender=Account)
