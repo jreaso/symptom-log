@@ -1,6 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponse
 from django.core.exceptions import PermissionDenied
 from authuser.models import Patient, Account
 
@@ -15,3 +15,12 @@ def patients_list(request):
         return render(request, "patients/patients_list.html", {"patients": patients})
     else:
         raise PermissionDenied
+    
+
+@login_required
+def patient_details(request, pk):
+    patient = get_object_or_404(Patient, pk=pk)
+    # Add any additional context data you need for the detail view
+    #context = {'patient': patient}
+    return HttpResponse("Patient Details Page")
+    #return render(request, 'patients/patient_detail.html', context)
