@@ -5,6 +5,15 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 
 
+def generate_id():
+        while True:
+            random_uuid = str(uuid.uuid4()).replace("-", "")
+            new_id = random_uuid[:8]
+
+            if not Account.objects.filter(id=new_id).exists():
+                return new_id
+            
+
 class AccountManager(BaseUserManager):
     def create_user(self, email, password=None, role="patient", **extra_fields):
         if not email:
@@ -72,18 +81,10 @@ class Account(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
     
-    def _generate_id():
-        while True:
-            random_uuid = str(uuid.uuid4()).replace("-", "")
-            new_id = random_uuid[:8]
-
-            if not Account.objects.filter(id=new_id).exists():
-                return new_id
-    
     def save(self, *args, **kwargs):
-        if not self.patient_id:
-            self.patient_id = self._generate_id()
-        super(Patient, self).save(*args, **kwargs)
+        if not self.id:
+            self.id = generate_id()
+        super(Account, self).save(*args, **kwargs)
 
 
 class Patient(models.Model):
