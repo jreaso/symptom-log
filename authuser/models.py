@@ -38,8 +38,8 @@ class AccountManager(BaseUserManager):
 
 
 class Account(AbstractBaseUser):
+    id = models.CharField(primary_key=True, max_length=8, unique=True, editable=False)
     email = models.EmailField(verbose_name="email", max_length=60, unique=True)
-    id = models.CharField(max_length=8, unique=True, editable=False)
 
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -76,7 +76,7 @@ class Account(AbstractBaseUser):
         while True:
             random_uuid = str(uuid.uuid4()).replace("-", "")
             new_id = random_uuid[:8]
-            
+
             if not Account.objects.filter(id=new_id).exists():
                 return new_id
     
