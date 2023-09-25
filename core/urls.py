@@ -16,11 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .views import index
+from . import views
+from forms.views import form_response_view
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("authuser.urls")),
     path("patients/", include("patients.urls")),
-    path("", index, name="index"),
+    path("", views.index, name="index"),
+    path("forms/", form_response_view, name="form_response"),  # temporary for developing the form data entry logic
 ]
