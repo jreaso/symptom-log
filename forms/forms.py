@@ -1,14 +1,18 @@
 from django import forms
-from .models import SymptomScoreResponse, TextResponse, MultipleChoiceResponse, StatusResponse, EventResponse
+from .models import SymptomScoreResponse, TextResponse, MultipleChoiceResponse, StatusResponse, EventResponse, StatusQuestion
+from django.utils import timezone
 
 class SymptomScoreResponseForm(forms.ModelForm):
     score = forms.IntegerField(
-        widget=forms.NumberInput(attrs={'type': 'range', 'min': 1, 'max': 10, 'class': 'form-control'})
+        widget=forms.NumberInput(attrs={'type': 'range', 'min': 1, 'max': 10, 'step': 1})
     )
 
     def __init__(self, *args, **kwargs):
         kwargs.pop('question', None)  # It pops and ignores the 'question' argument
         super().__init__(*args, **kwargs)
+
+        for field in self.fields:
+            self.fields[field].label = None
 
     class Meta:
         model = SymptomScoreResponse
@@ -31,21 +35,18 @@ class MultipleChoiceResponseForm(forms.ModelForm):
 
         if self.question and hasattr(self.question, 'multiplechoicequestion'):
             choices = [(choice.strip(), choice.strip()) for choice in self.question.multiplechoicequestion.options.split(',')]
-            print(f"Setting choices for question {self.question.id}: {choices}")
             self.fields['choice'].choices = choices
 
     choice = forms.ChoiceField(widget=forms.RadioSelect)
 
     def clean(self):
         cleaned_data = super().clean()
-        print(f"Form-wide validation errors for question {self.question.id}: {self.errors}")
         return cleaned_data
 
     def clean_choice(self):
         value = self.cleaned_data['choice']
         if self.question:
             choices = [(choice.strip(), choice.strip()) for choice in self.question.multiplechoicequestion.options.split(',')]
-            print(f"Choices during validation for question {self.question.id}: {choices}")
             if value not in dict(choices).keys():
                 raise forms.ValidationError(f"Select a valid choice. {value} is not one of the available choices.")
         return value
@@ -57,8 +58,20 @@ class MultipleChoiceResponseForm(forms.ModelForm):
 class StatusResponseForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
-        kwargs.pop('question', None)  # It pops and ignores the 'question' argument
+        question = kwargs.pop('question', None)
         super().__init__(*args, **kwargs)
+
+        self.fields['status'].widget.attrs.update({'class': 'form-check-input'})
+
+        if question:
+            try:
+                latest_response = StatusResponse.objects.filter(question=question).latest('form_response__submitted_at')
+                self.fields['status'].initial = latest_response.status
+            except StatusResponse.DoesNotExist:
+                pass
+
+            self.fields['status'].widget.attrs['option_0'] = question.statusquestion.option_0
+            self.fields['status'].widget.attrs['option_1'] = question.statusquestion.option_1
 
     class Meta:
         model = StatusResponse
@@ -73,6 +86,7 @@ class EventResponseForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         kwargs.pop('question', None)  # It pops and ignores the 'question' argument
         super().__init__(*args, **kwargs)
+        self.fields['event_datetime'].initial = timezone.now().replace(second=0, microsecond=0)
 
     class Meta:
         model = EventResponse

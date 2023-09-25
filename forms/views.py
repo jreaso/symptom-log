@@ -56,7 +56,7 @@ def _get_form_for_question(question):
         elif hasattr(question, 'multiplechoicequestion'):
             return (MultipleChoiceResponseForm, MultipleChoiceResponseForm(prefix=str(question.id), question=question))
         elif hasattr(question, 'statusquestion'):
-            return (StatusResponseForm, StatusResponseForm(prefix=str(question.id)))
+            return (StatusResponseForm, StatusResponseForm(prefix=str(question.id), question=question))
         elif hasattr(question, 'eventquestion'):
             return (EventResponseForm, EventResponseForm(prefix=str(question.id)))
     except Exception as e:
