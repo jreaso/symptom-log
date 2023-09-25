@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, HttpResponse
 from django.core.exceptions import PermissionDenied
 from authuser.models import Account, Patient, Clinician
+from forms.models import FormResponse
 
 
 @login_required
@@ -12,7 +13,18 @@ def patients_list(request):
             patients = Patient.objects.all()
         elif request.user.role == Account.Role.CLINICIAN:
             patients = request.user.clinician.patients.all()
-        return render(request, "patients/patients_list.html", {"patients": patients})
+
+        patients_with_dates = []
+        for patient in patients:
+            latest_form_response = FormResponse.objects.filter(form__patient=patient.user).order_by('-submitted_at').first()
+            if latest_form_response:
+                patients_with_dates.append((patient, latest_form_response.submitted_at))
+            else:
+                patients_with_dates.append((patient, "No forms"))
+        
+        context = {"patients_with_dates": patients_with_dates}
+
+        return render(request, "patients/patients_list.html", context)
     else:
         raise PermissionDenied
     

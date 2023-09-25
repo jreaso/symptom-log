@@ -3,11 +3,16 @@ from django.http import HttpResponse
 from .models import Form, FormResponse
 from .forms import SymptomScoreResponseForm, TextResponseForm, MultipleChoiceResponseForm, StatusResponseForm, EventResponseForm
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
+from authuser.models import Account
 
 
 @login_required
-def form_response_view(request):
-    form_instance = Form.objects.first()  # Temporary for testing
+def new_form_response_view(request, pk, form_id):
+    patient = get_object_or_404(Account, pk=pk)
+    form_instance = get_object_or_404(Form, id=form_id, patient=patient)
+
+
     response_forms_questions = []
 
     if request.method == 'POST':

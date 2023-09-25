@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <div class="my-4 font-monospace">
+    <div class="my-4">
       <table class="table table-bordered">
         <thead>
           <tr>
@@ -24,13 +24,13 @@
           </tr>
         </thead>
         <tbody>
-          {% for patient in patients %}
+          {% for patient, recent_form_date in patients_with_dates %}
             <tr>
               <td><a href="{% url 'patient_details' patient.user.pk %}">{{ patient.user.first_name }} {{ patient.user.last_name }}</a></td>
-              <td>{{ patient.user.id }}</td>
+              <td class="font-monospace">{{ patient.user.id }}</td>
               <td>{{ patient.dob }}</td>
               <td>{{ patient.get_sex_display }}</td>
-              <td><!-- Add content for last form submission here --></td>
+              <td>{{ recent_form_date }}</td>
             </tr>
           {% endfor %}
         </tbody>
