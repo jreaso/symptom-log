@@ -4,31 +4,37 @@ from .models import Form, FormResponse
 from .forms import SymptomScoreResponseForm, TextResponseForm, MultipleChoiceResponseForm, StatusResponseForm, EventResponseForm
 from django.contrib.auth.decorators import login_required
 
+
 @login_required
 def form_response_view(request):
-    form_instance = Form.objects.first()
+    form_instance = Form.objects.first()  # Temporary for testing
+    response_forms_questions = []
 
     if request.method == 'POST':
+        for question in form_instance.questions.all():
+            form_class, question_form_instance = _get_form_for_question(question)
+            if form_class:
+                response_form = form_class(request.POST, prefix=str(question.id), question=question)
+                response_forms_questions.append((response_form, question))
+        
+        if all([response_form.is_valid() for response_form, question in response_forms_questions]):
+            form_response = FormResponse(form=form_instance, submitted_by=request.user)
+            form_response.save()
+
+            for response_form, question in response_forms_questions:
+                response_instance = response_form.save(commit=False)
+                response_instance.form_response = form_response
+                response_instance.question = question
+                response_instance.save()
+        
+        else:
+            print("INVALID RESPONSE!")
+        
         form_response = FormResponse(form=form_instance, submitted_by=request.user)
         form_response.save()
 
-        for question in form_instance.questions.all():
-            print(f"Submitted data for question {question.id}: {request.POST.get(str(question.id) + '-choice')}")
-            form_class, form_instance = _get_form_for_question(question)  # Unpack the tuple here
-            if form_class:  # Only process if we found a valid form class for the question
-                response_form = form_class(request.POST, prefix=str(question.id), question=question)
-                if response_form.is_valid():
-                    response_instance = response_form.save(commit=False)
-                    print(f"Question being assigned to response: {question.id}")
-                    response_instance.form_response = form_response
-                    response_instance.question = question
-                    response_instance.save()
-                else: #DELETE
-                    print(f"Form errors for question {question.id}: {response_form.errors}")
-
-        return HttpResponse("Success")  # You can replace 'some-success-url' with a real URL
-
-
+        return HttpResponse("Success")  # Temporary for testing - should route to view the responses page
+    
     context = {
         'form_instance': form_instance,
         'form_response_forms': [
@@ -38,6 +44,8 @@ def form_response_view(request):
     }
 
     return render(request, 'forms/form_response.html', context)
+
+
 
 def _get_form_for_question(question):
     try:
