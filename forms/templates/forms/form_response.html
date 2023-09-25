@@ -5,19 +5,28 @@
 {% block content %}
 <div class="container my-5">
     <div>
+      <h4 class="text-muted">{{ form_instance.patient }}</h4>
       <h1 class="display-4 fw-bold">{{ form_instance.title }}</h1>
+      <h5 class="text-muted">Fill out a new response.</h5>
     </div>
 
     <div class="my-4">
         <form method="post">
             {% csrf_token %}
             {% for question, form_class, form in form_response_forms %}
-                <div>
-                    <label>{{ question.question_title }}</label>
-                    {{ form }}
+                <div class="card my-4">
+                    <div class="card-content">
+                        <div class="card-header">
+                            <h5 class="card-title">{{ question.question_title }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">{{ question.label }}</h6>
+                            {{ form.as_p }}
+                        </div>
+                    </div>
                 </div>
             {% endfor %}
-            <input type="submit" value="Submit">
+            <input type="submit" value="Submit" class="btn btn-primary btn-lg float-end">
         </form>
     </div>
   </div>

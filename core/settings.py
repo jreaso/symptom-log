@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -12,6 +13,11 @@ SECRET_KEY = "django-insecure-y7!rj2958b%rm4n)lp6==&1zf93yp(p+62^5rmf11&luz$ror@
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+if DEBUG:
+    # Disable caching for static files
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+    STATIC_URL = '/static/'
 
 ALLOWED_HOSTS = []
 

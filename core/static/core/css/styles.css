@@ -20,3 +20,8 @@ a.grey-link {
 a.grey-link:hover {
     color: #333;
 }
+
+input[type="datetime-local"] {
+    width: auto;
+}
+
