@@ -17,9 +17,12 @@ def form_response_view(request):
                 response_form = form_class(request.POST, prefix=str(question.id))
                 if response_form.is_valid():
                     response_instance = response_form.save(commit=False)
+                    print(f"Question being assigned to response: {question.id}")
                     response_instance.form_response = form_response
                     response_instance.question = question
                     response_instance.save()
+                else: #DELETE
+                    print(f"Form errors for question {question.id}: {response_form.errors}")
 
         return HttpResponse("Success")  # You can replace 'some-success-url' with a real URL
 
