@@ -1,20 +1,22 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import Form, FormResponse, SymptomScoreQuestion, TextQuestion, MultipleChoiceQuestion, StatusQuestion, EventQuestion
+from .models import Form, FormResponse
 from .forms import SymptomScoreResponseForm, TextResponseForm, MultipleChoiceResponseForm, StatusResponseForm, EventResponseForm
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def form_response_view(request):
     form_instance = Form.objects.first()
 
     if request.method == 'POST':
-        print(request.POST)
         form_response = FormResponse(form=form_instance, submitted_by=request.user)
         form_response.save()
 
         for question in form_instance.questions.all():
+            print(f"Submitted data for question {question.id}: {request.POST.get(str(question.id) + '-choice')}")
             form_class, form_instance = _get_form_for_question(question)  # Unpack the tuple here
             if form_class:  # Only process if we found a valid form class for the question
-                response_form = form_class(request.POST, prefix=str(question.id))
+                response_form = form_class(request.POST, prefix=str(question.id), question=question)
                 if response_form.is_valid():
                     response_instance = response_form.save(commit=False)
                     print(f"Question being assigned to response: {question.id}")
