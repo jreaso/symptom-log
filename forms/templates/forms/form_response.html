@@ -5,8 +5,25 @@
 {% block content %}
 <div class="container my-5">
     <div>
+        <h4 class="text-muted">PATIENT</h4><!--PATIENT-->
         <h1 class="display-4 fw-bold">{{ form_instance.title }} - {{ form_response.submitted_at }}</h1>
+        <h5 class="text-muted">DATE</h5><!--DATE-->
     </div>
 
+    <div class="my-4">
+        {% for ... %}<!--FOR LOOP OVER QUESTIONS-->
+            <div class="card my-4">
+                <div class="card-content">
+                    <div class="card-header">
+                        <h5 class="card-title">QUESTION TITLE</h5><!--QUESTION TITLE-->
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">QUESTION LABEL</h6><!--QUESTION LABEL-->
+                        <p>QUESTION VALUE</p><!--QUESTION VALUE-->
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}
