@@ -48,7 +48,7 @@ def new_form_response_view(request, pk, form_id):
         ]
     }
 
-    return render(request, 'forms/form_response.html', context)
+    return render(request, 'forms/form_response_new.html', context)
 
 
 
