@@ -102,8 +102,9 @@ def form_responses_list_view(request, pk, form_id):
     form_instance = get_object_or_404(Form, id=form_id, patient=patient)
 
     form_responses = FormResponse.objects.filter(form=form_instance).order_by('submitted_at')
-
-    return render(request, 'form_responses_list.html', {
-        'form': form_instance,
+    
+    context ={ 
+        'form_instance': form_instance,
         'form_responses': form_responses
-    })
+    }
+    return render(request, 'forms/form_responses_list.html', context)
