@@ -4,6 +4,7 @@ from .models import Form, FormResponse, Response
 from .forms import SymptomScoreResponseForm, TextResponseForm, MultipleChoiceResponseForm, StatusResponseForm, EventResponseForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ValidationError
 from authuser.models import Account
 from datetime import datetime, timedelta
 from .forms import CreateNewFormForm
@@ -37,9 +38,10 @@ def new_form_response_view(request, pk, form_id):
         
         else:
             print(f"INVALID RESPONSE! {[response_form.is_valid() for response_form, question in response_forms_questions]}")
-            return HttpResponse("Invalid Form Response")
+            raise ValidationError("Invalid Form Response")
 
-        return HttpResponse("Success")  # Temporary for testing - should route to view the responses page
+        response_datetime_str = form_response.submitted_at.strftime('%Y%m%d%H%M%S')
+        return redirect('form_response', pk=form_response.form.patient.id, form_id=form_response.form.id, response_datetime=response_datetime_str)
     
     context = {
         'form_instance': form_instance,
