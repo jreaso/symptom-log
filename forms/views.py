@@ -16,27 +16,27 @@ def new_form_response_view(request, pk, form_id):
     response_forms_questions = []
 
     if request.method == 'POST':
-        for question in form_instance.questions.all():
+        for question in form_instance.questions.all().order_by('order'):
             form_class, question_form_instance = _get_form_for_question(question)
             if form_class:
                 response_form = form_class(request.POST, prefix=str(question.id), question=question)
                 response_forms_questions.append((response_form, question))
         
         if all([response_form.is_valid() for response_form, question in response_forms_questions]):
-            form_response = FormResponse(form=form_instance, submitted_by=request.user)
+            form_response = FormResponse(form=form_instance)
+            form_response.submitted_by = request.user
             form_response.save()
 
             for response_form, question in response_forms_questions:
-                response_instance = response_form.save(commit=False)
-                response_instance.form_response = form_response
-                response_instance.question = question
-                response_instance.save()
+                if all(value is not None and value != "" for value in response_form.cleaned_data.values()):
+                    response_instance = response_form.save(commit=False)
+                    response_instance.form_response = form_response
+                    response_instance.question = question
+                    response_instance.save()
         
         else:
-            print("INVALID RESPONSE!")
-        
-        form_response = FormResponse(form=form_instance, submitted_by=request.user)
-        form_response.save()
+            print(f"INVALID RESPONSE! {[response_form.is_valid() for response_form, question in response_forms_questions]}")
+            return HttpResponse("Invalid Form Response")
 
         return HttpResponse("Success")  # Temporary for testing - should route to view the responses page
     
@@ -44,7 +44,7 @@ def new_form_response_view(request, pk, form_id):
         'form_instance': form_instance,
         'form_response_forms': [
             (question, form_class, form_instance) for question, (form_class, form_instance) in 
-            [(q, _get_form_for_question(q)) for q in form_instance.questions.all()]
+            [(q, _get_form_for_question(q)) for q in form_instance.questions.all().order_by('order')]
         ]
     }
 

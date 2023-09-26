@@ -8,11 +8,12 @@ class SymptomScoreResponseForm(forms.ModelForm):
     )
 
     def __init__(self, *args, **kwargs):
-        kwargs.pop('question', None)  # It pops and ignores the 'question' argument
+        kwargs.pop('question', None)
         super().__init__(*args, **kwargs)
 
-        for field in self.fields:
-            self.fields[field].label = None
+        for field_name, field in self.fields.items():
+            field.label = None
+            field.required = False
 
     class Meta:
         model = SymptomScoreResponse
@@ -21,8 +22,11 @@ class SymptomScoreResponseForm(forms.ModelForm):
 class TextResponseForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
-        kwargs.pop('question', None)  # It pops and ignores the 'question' argument
+        kwargs.pop('question', None)
         super().__init__(*args, **kwargs)
+
+        for field_name, field in self.fields.items():
+            field.required = False
 
     class Meta:
         model = TextResponse
@@ -32,6 +36,9 @@ class MultipleChoiceResponseForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.question = kwargs.pop('question', None)
         super().__init__(*args, **kwargs)
+
+        for field_name, field in self.fields.items():
+            field.required = False
 
         if self.question and hasattr(self.question, 'multiplechoicequestion'):
             choices = [(choice.strip(), choice.strip()) for choice in self.question.multiplechoicequestion.options.split(',')]
@@ -45,10 +52,11 @@ class MultipleChoiceResponseForm(forms.ModelForm):
 
     def clean_choice(self):
         value = self.cleaned_data['choice']
-        if self.question:
-            choices = [(choice.strip(), choice.strip()) for choice in self.question.multiplechoicequestion.options.split(',')]
-            if value not in dict(choices).keys():
-                raise forms.ValidationError(f"Select a valid choice. {value} is not one of the available choices.")
+        if value:
+            if self.question:
+                choices = [(choice.strip(), choice.strip()) for choice in self.question.multiplechoicequestion.options.split(',')]
+                if value not in dict(choices).keys():
+                    raise forms.ValidationError(f"Select a valid choice. {value} is not one of the available choices.")
         return value
 
     class Meta:
@@ -84,9 +92,11 @@ class EventResponseForm(forms.ModelForm):
     )
     
     def __init__(self, *args, **kwargs):
-        kwargs.pop('question', None)  # It pops and ignores the 'question' argument
+        kwargs.pop('question', None)
         super().__init__(*args, **kwargs)
-        self.fields['event_datetime'].initial = timezone.now().replace(second=0, microsecond=0)
+        for field_name, field in self.fields.items():
+            field.required = False
+        #self.fields['event_datetime'].initial = timezone.now().replace(second=0, microsecond=0)
 
     class Meta:
         model = EventResponse

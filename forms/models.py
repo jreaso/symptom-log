@@ -60,7 +60,8 @@ class SymptomScoreQuestion(Question):
 
 class SymptomScoreResponse(Response):
     score = models.PositiveIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(10)]
+        validators=[MinValueValidator(1), MaxValueValidator(10)],
+        null=True, blank=True
     )
 
 
@@ -68,14 +69,14 @@ class TextQuestion(Question):
     pass
 
 class TextResponse(Response):
-    text = models.TextField()
+    text = models.TextField(null=True, blank=True)
 
 
 class MultipleChoiceQuestion(Question):
-    options = models.CharField(max_length=255, null=True, blank=True)  # Store options as a comma-separated text
+    options = models.CharField(max_length=255)  # Store options as a comma-separated text
 
 class MultipleChoiceResponse(Response):
-    choice = models.CharField(max_length=255)
+    choice = models.CharField(max_length=255, null=True, blank=True)
 
 
 class StatusQuestion(Question):
@@ -90,5 +91,5 @@ class EventQuestion(Question):
     pass
 
 class EventResponse(Response):
-    event_datetime = models.DateTimeField()
+    event_datetime = models.DateTimeField(null=True, blank=True)
 

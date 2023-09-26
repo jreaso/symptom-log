@@ -61,16 +61,16 @@
     </div>
 </div>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const slider = document.querySelector('input[type="range"]');
-        const ticks = document.querySelectorAll('.slider-ticks span');
+document.addEventListener('DOMContentLoaded', function() {
+    const slider = document.querySelector('input[type="range"]');
+    const ticks = document.querySelectorAll('.slider-ticks span');
 
-        ticks.forEach(tick => {
-            const value = tick.getAttribute('data-value');
-            const position = (value - slider.min) / (slider.max - slider.min) * slider.offsetWidth;
-            tick.style.left = position + 'px';
-        });
+    ticks.forEach(tick => {
+        const value = tick.getAttribute('data-value');
+        const position = (value - slider.min) / (slider.max - slider.min) * slider.offsetWidth;
+        tick.style.left = position + 'px';
     });
+});
 </script>
 {% endblock %}
 
