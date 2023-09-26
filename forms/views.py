@@ -69,3 +69,6 @@ def _get_form_for_question(question):
     return (None, None)
 
 
+@login_required
+def form_response_view(request):
+    pass

@@ -1,0 +1,12 @@
+{% extends "core/base.html" %}
+
+{% block title %}Form Response - {{ form_instance.title }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div>
+        <h1 class="display-4 fw-bold">{{ form_instance.title }} - {{ form_response.submitted_at }}</h1>
+    </div>
+
+</div>
+{% endblock %}
