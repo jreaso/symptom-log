@@ -13,11 +13,27 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <!-- Left links -->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                {% if user.role == "admin" %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'index' %}">Patients</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'index' %}">Clinicians</a>
+                    </li>
+                {% elif user.role == "clinician" %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'index' %}">Patients</a>
+                    </li>
+                {% elif user.role == "patient" %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'index' %}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'index' %}">Forms</a>
+                    </li>
+                {% endif %}
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Patients</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Account</a>
+                    <a class="nav-link" href="{% url 'index' %}">Account</a>
                 </li>
             </ul>
 
