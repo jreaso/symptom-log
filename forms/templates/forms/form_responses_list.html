@@ -9,7 +9,7 @@
         <h1 class="display-6 fw-bold">{{ form_instance.title }}</h1>
         <div class="mt-2">
           <a href="{% url 'new_form_response' pk=form_instance.patient.id form_id=form_instance.id %}"><button type="button" class="btn btn-success my-3">Submit New Response</button></a>
-          <a href="#"><button type="button" class="btn btn-secondary my-3 mx-2">Edit Form</button></a>
+          <a href="{% url 'edit_form' form_id=form_instance.id pk=form_instance.patient.id %}"><button type="button" class="btn btn-secondary my-3 mx-2">Edit Form</button></a>
         </div>
     </div>
 

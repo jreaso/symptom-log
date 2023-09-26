@@ -126,3 +126,17 @@ def create_new_form(request, pk):
 
     # If there's any other situation, just redirect back to '#'.
     return HttpResponseRedirect('#')
+
+@login_required
+def edit_form_view(request, pk, form_id):
+    patient = get_object_or_404(Account, pk=pk)
+    form_instance = get_object_or_404(Form, id=form_id, patient=patient)
+
+    questions = form_instance.questions.all()
+
+    context = {
+        'form_instance': form_instance,
+        'questions': questions,
+    }
+
+    return render(request, 'forms/edit_form.html', context)

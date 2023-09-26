@@ -1,0 +1,20 @@
+{% extends "core/base.html" %}
+
+{% block title %}Edit Form - {{ form_instance.title }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div>
+        <h4 class="text-muted">{{ form_instance.patient }}</h4>
+        <h1 class="display-6 fw-bold">Edit Form - {{ form_instance.title }}</h1>
+    </div>
+
+    <h1>Questions</h1>
+
+    <div class="my-4">
+      {% for question in questions %}
+      <p>{{ question }}</p>
+      {% endfor %}
+    </div>
+</div>
+{% endblock %}
