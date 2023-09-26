@@ -1,13 +1,13 @@
 {% for form, last_response_datetime in patient_forms %}
-<div class="card my-3">
-    <div class="card-body">
-      <h5 class="card-title"><a href="#">{{ form.title}}</a></h5>
-      <h6 class="card-subtitle mb-2 text-muted">{{ form.patient }}</h6>
-      <p class="card-text"></p><b>Last Response:</b> {{ last_response_datetime }}<br>
-      <b>Number of Questions:</b> {{ form.questions.count }}<br>
-      <b>Description:</b> {{ form.description }}</p>
-    </div>
-</div>
+  <div class="card my-3">
+      <div class="card-body">
+        <h5 class="card-title"><a href="{% url 'form_responses_list' pk=patient.user.id form_id=form.id %}">{{ form.title}}</a></h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{ form.patient }}</h6>
+        <p class="card-text"></p><b>Last Response:</b> {{ last_response_datetime }}<br>
+        <b>Number of Questions:</b> {{ form.questions.count }}<br>
+        <b>Description:</b> {{ form.description }}</p>
+      </div>
+  </div>
 {% empty %}
     <p class="text-danger text-center">No Forms Found</p>
 {% endfor %}

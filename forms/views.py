@@ -101,10 +101,11 @@ def form_responses_list_view(request, pk, form_id):
     patient = get_object_or_404(Account, pk=pk)
     form_instance = get_object_or_404(Form, id=form_id, patient=patient)
 
-    form_responses = FormResponse.objects.filter(form=form_instance).order_by('submitted_at')
+    form_responses = FormResponse.objects.filter(form=form_instance).order_by('-submitted_at')
     
     context ={ 
         'form_instance': form_instance,
-        'form_responses': form_responses
+        'form_responses': form_responses,
+        'patient': patient
     }
     return render(request, 'forms/form_responses_list.html', context)
