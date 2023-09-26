@@ -45,10 +45,13 @@ def patient_details(request, pk):
         last_response_date = last_response.submitted_at if last_response else None
 
         patient_forms_details.append((form, last_response_date))
+    
+    form_responses = FormResponse.objects.filter(form__patient=patient.user).order_by('submitted_at')
 
     context = {
         'patient': patient,
         'patient_forms': patient_forms_details,
+        'form_responses': form_responses
     }
 
     if request.user.role == Account.Role.ADMIN:
@@ -56,7 +59,6 @@ def patient_details(request, pk):
     elif request.user.role == Account.Role.CLINICIAN:
         clinician = request.user.clinician
         if patient in clinician.patients.all():
-            #return HttpResponse("Patient Page")
             return render(request, "patients/patient_details.html", context)
         else:
             return HttpResponse("Patient Is Not Registered With You")
