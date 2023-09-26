@@ -38,7 +38,18 @@ def patient_details(request, pk):
     patient = get_object_or_404(Patient, pk=pk)
     patient_forms = patient.user.forms.all()
 
-    context = {'patient': patient, 'patient_forms': patient_forms}
+    patient_forms_details = []
+
+    for form in patient_forms:
+        last_response = form.responses.order_by('-submitted_at').first()
+        last_response_date = last_response.submitted_at if last_response else None
+
+        patient_forms_details.append((form, last_response_date))
+
+    context = {
+        'patient': patient,
+        'patient_forms': patient_forms_details,
+    }
 
     if request.user.role == Account.Role.ADMIN:
         return render(request, "patients/patient_details.html", context)
