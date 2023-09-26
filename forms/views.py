@@ -45,7 +45,8 @@ def new_form_response_view(request, pk, form_id):
         'form_response_forms': [
             (question, form_class, form_instance) for question, (form_class, form_instance) in 
             [(q, _get_form_for_question(q)) for q in form_instance.questions.all().order_by('order')]
-        ]
+        ],
+        'user': request.user
     }
 
     return render(request, 'forms/form_response_new.html', context)

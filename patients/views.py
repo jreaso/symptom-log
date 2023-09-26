@@ -22,7 +22,10 @@ def patients_list(request):
             else:
                 patients_with_dates.append((patient, "No forms"))
         
-        context = {"patients_with_dates": patients_with_dates}
+        context = {
+            "patients_with_dates": patients_with_dates,
+            'user': request.user
+        }
 
         return render(request, "patients/patients_list.html", context)
     else:

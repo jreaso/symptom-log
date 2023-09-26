@@ -23,6 +23,7 @@
 
             <!-- Right logout -->
             <div class="d-flex align-items-center">
+                <p class="my-0 mx-4 d-none d-lg-flex text-white">Hello, {{ user.first_name }}!</p>
                 <a href="{% url 'logout' %}" class="btn btn-light">Log Out</a>
             </div>
         </div>
