@@ -1,17 +1,17 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import Form, FormResponse
+from .models import Form, FormResponse, Response
 from .forms import SymptomScoreResponseForm, TextResponseForm, MultipleChoiceResponseForm, StatusResponseForm, EventResponseForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from authuser.models import Account
+from datetime import datetime, timedelta
 
 
 @login_required
 def new_form_response_view(request, pk, form_id):
     patient = get_object_or_404(Account, pk=pk)
     form_instance = get_object_or_404(Form, id=form_id, patient=patient)
-
 
     response_forms_questions = []
 
@@ -71,5 +71,26 @@ def _get_form_for_question(question):
 
 
 @login_required
-def form_response_view(request):
-    pass
+def form_response_view(request, pk, form_id, response_datetime):
+    patient = get_object_or_404(Account, pk=pk)
+    form_instance = get_object_or_404(Form, id=form_id, patient=patient)
+
+    submitted_at_start = datetime.strptime(response_datetime, '%Y%m%d%H%M%S')
+    submitted_at_end = submitted_at_start + timedelta(seconds=1)
+    form_response = get_object_or_404(
+        FormResponse,
+        form=form_instance,
+        submitted_at__gte=submitted_at_start,
+        submitted_at__lt=submitted_at_end
+    )
+
+    question_responses = Response.objects.filter(form_response=form_response).order_by('question__order')
+
+    context = {
+        'form_instance': form_instance,
+        'form_response': form_response,
+        'question_responses': question_responses,
+        'user': request.user
+    }
+
+    return render(request, 'forms/form_response.html', context)
