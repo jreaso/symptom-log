@@ -58,3 +58,17 @@ input[type="checkbox"] {
     background-color: #5e72e4;  /* Example color when the toggle is ON */
     border-color: #5e72e4;
 }
+
+.custom-close {
+    border: none;
+    background: none;
+    padding: 0;
+    font-size: 1.5rem; /* Adjust the size if needed */
+    color: #333; /* Adjust the color if needed */
+    opacity: 0.7;
+}
+
+.custom-close:hover {
+    color: #666; /* Adjust hover color if needed */
+    opacity: 1;
+}

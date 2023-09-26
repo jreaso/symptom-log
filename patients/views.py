@@ -46,7 +46,7 @@ def patient_details(request, pk):
 
         patient_forms_details.append((form, last_response_date))
     
-    form_responses = FormResponse.objects.filter(form__patient=patient.user).order_by('submitted_at')
+    form_responses = FormResponse.objects.filter(form__patient=patient.user).order_by('-submitted_at')
 
     context = {
         'patient': patient,

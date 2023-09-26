@@ -1,5 +1,5 @@
 from django import forms
-from .models import SymptomScoreResponse, TextResponse, MultipleChoiceResponse, StatusResponse, EventResponse, StatusQuestion
+from .models import SymptomScoreResponse, TextResponse, MultipleChoiceResponse, StatusResponse, EventResponse, StatusQuestion, Form
 from django.utils import timezone
 
 class SymptomScoreResponseForm(forms.ModelForm):
@@ -101,3 +101,9 @@ class EventResponseForm(forms.ModelForm):
     class Meta:
         model = EventResponse
         fields = ['event_datetime']
+
+
+class CreateNewFormForm(forms.ModelForm):
+    class Meta:
+        model = Form
+        fields = ['title', 'description']

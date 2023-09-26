@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from .models import Form, FormResponse, Response
 from .forms import SymptomScoreResponseForm, TextResponseForm, MultipleChoiceResponseForm, StatusResponseForm, EventResponseForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from authuser.models import Account
 from datetime import datetime, timedelta
+from .forms import CreateNewFormForm
 
 
 @login_required
@@ -109,3 +110,17 @@ def form_responses_list_view(request, pk, form_id):
         'patient': patient
     }
     return render(request, 'forms/form_responses_list.html', context)
+
+
+def create_new_form(request, pk):
+
+    if request.method == 'POST':
+        form = CreateNewFormForm(request.POST)
+        if form.is_valid():
+            new_form = form.save(commit=False)
+            new_form.patient = Account.objects.get(id=pk)
+            new_form.save()
+            return HttpResponseRedirect('#')  # redirect to #
+
+    # If there's any other situation, just redirect back to '#'.
+    return HttpResponseRedirect('#')
