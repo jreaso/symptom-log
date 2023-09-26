@@ -94,3 +94,16 @@ def form_response_view(request, pk, form_id, response_datetime):
     }
 
     return render(request, 'forms/form_response.html', context)
+
+
+@login_required
+def form_responses_list_view(request, pk, form_id):
+    patient = get_object_or_404(Account, pk=pk)
+    form_instance = get_object_or_404(Form, id=form_id, patient=patient)
+
+    form_responses = FormResponse.objects.filter(form=form_instance).order_by('submitted_at')
+
+    return render(request, 'form_responses_list.html', {
+        'form': form_instance,
+        'form_responses': form_responses
+    })

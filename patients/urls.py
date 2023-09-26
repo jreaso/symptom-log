@@ -1,7 +1,7 @@
 from django.urls import path, include
 
 from . import views
-from forms.views import new_form_response_view, form_response_view
+from forms.views import new_form_response_view, form_response_view, form_responses_list_view
 
 form_submission_patterns = [
     path('new', new_form_response_view, name='new_form_response'),
@@ -10,6 +10,7 @@ form_submission_patterns = [
 
 form_patterns = [
     path('<int:form_id>/submissions/', include(form_submission_patterns)),
+    path('<int:form_id>/', form_responses_list_view, name='form_responses_list')
 ]
 
 urlpatterns = [
