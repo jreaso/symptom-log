@@ -1,0 +1,20 @@
+<table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">Datetime</th>
+        <th scope="col">Form</th>
+        <th scope="col">Patient</th>
+        <th scope="col">Submitted By</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for response in form_responses %}
+        <tr>
+          <td><a href="#">{{ response.submitted_at }}</a></td>
+          <td><a href="#">{{ form_instance.title }}</a></td>
+          <td><a href="#">{{ form_instance.patient }}</a></td>
+          <td>{{ response.submitted_by }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+</table>
