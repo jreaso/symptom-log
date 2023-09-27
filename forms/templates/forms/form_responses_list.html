@@ -8,8 +8,16 @@
         <h4 class="text-muted">{{ form_instance.patient }}</h4>
         <h1 class="display-6 fw-bold">{{ form_instance.title }}</h1>
         <div class="mt-2">
+          <!-- New Response Button -->
           <a href="{% url 'new_form_response' pk=form_instance.patient.id form_id=form_instance.id %}"><button type="button" class="btn btn-success my-3">Submit New Response</button></a>
-          <a href="{% url 'edit_form' form_id=form_instance.id pk=form_instance.patient.id %}"><button type="button" class="btn btn-secondary my-3 mx-2">Edit Form</button></a>
+          <!-- Edit Button -->
+          <a href="{% url 'edit_form' form_id=form_instance.id pk=form_instance.patient.id %}"><button type="button" class="btn btn-secondary my-3 mx-2">
+            <i class="fas fa-edit"></i> Edit Form
+          </button></a>
+          <!-- Delete Button -->
+          <button class="btn btn-danger deleteBtn" data-bs-toggle="modal" data-bs-target="#deleteModal" data-form-id="{{ form_instance.id }}">
+            <i class="fas fa-trash"></i> Delete
+          </button>
         </div>
     </div>
 
@@ -21,5 +29,28 @@
     <div class="my-4">
       {% include 'forms/form_responses_list_table.html' %}
     </div>
+</div>
+
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+  <div class="modal-content">
+      <div class="modal-header">
+      <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      Are you sure you want to delete this form? This will also delete all instances of responses to this form.
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <form method="post" action="{% url 'delete_form' form_id=form_instance.id pk=form_instance.patient.id form_id=form_instance.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
+      </div>
+  </div>
+  </div>
 </div>
 {% endblock %}

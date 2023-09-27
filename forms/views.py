@@ -113,7 +113,7 @@ def form_responses_list_view(request, pk, form_id):
     }
     return render(request, 'forms/form_responses_list.html', context)
 
-
+@login_required
 def create_new_form(request, pk):
 
     if request.method == 'POST':
@@ -122,10 +122,17 @@ def create_new_form(request, pk):
             new_form = form.save(commit=False)
             new_form.patient = Account.objects.get(id=pk)
             new_form.save()
-            return HttpResponseRedirect('#')  # redirect to #
+            return redirect('form_responses_list', pk=pk, form_id=new_form.id)
+    
+    return redirect('patient_details', pk=pk)
 
-    # If there's any other situation, just redirect back to '#'.
-    return HttpResponseRedirect('#')
+
+@login_required
+def delete_form_view(request, pk, form_id):
+    form = get_object_or_404(Form, id=form_id)
+    form.delete()
+    return redirect('patient_details', pk=pk)
+
 
 @login_required
 def edit_form_view(request, pk, form_id):
