@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import Form, FormResponse, Response
+from .models import Form, FormResponse, Response, Question
 from .forms import SymptomScoreResponseForm, TextResponseForm, MultipleChoiceResponseForm, StatusResponseForm, EventResponseForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
@@ -132,7 +132,7 @@ def edit_form_view(request, pk, form_id):
     patient = get_object_or_404(Account, pk=pk)
     form_instance = get_object_or_404(Form, id=form_id, patient=patient)
 
-    questions = form_instance.questions.all()
+    questions = form_instance.questions.all().order_by('order')
 
     context = {
         'form_instance': form_instance,
@@ -140,3 +140,35 @@ def edit_form_view(request, pk, form_id):
     }
 
     return render(request, 'forms/edit_form.html', context)
+
+
+@login_required
+def delete_question_view(request, question_id, pk, form_id):
+    question = get_object_or_404(Question, id=question_id)
+    question.delete()
+    return redirect('edit_form', pk=pk, form_id=form_id)
+
+
+@login_required
+def edit_question_view(request, question_id, pk, form_id):
+    question = get_object_or_404(Question, id=question_id)
+
+    if request.method == 'POST':
+        question_title = request.POST.get('question_title')
+        question_label = request.POST.get('question_label')
+        
+        question.question_title = question_title
+        question.label = question_label
+        question.save()
+
+        if hasattr(question, 'statusquestion'):
+            status_question = question.statusquestion
+            option_0 = request.POST.get('option_0')
+            option_1 = request.POST.get('option_1')
+            
+            status_question.option_0 = option_0
+            status_question.option_1 = option_1
+            status_question.save()
+
+        return redirect('edit_form', pk=pk, form_id=form_id)
+
