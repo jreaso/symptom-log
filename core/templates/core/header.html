@@ -2,7 +2,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
         <!-- Navbar brand -->
-        <span class="navbar-brand mb-0 h1">Symptom Log</span>
+        <a href="{% url 'index' %}"><span class="navbar-brand mb-0 h1">Symptom Log</span></a>
 
         <!-- Toggler button for small viewports -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
@@ -15,14 +15,14 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 {% if user.role == "admin" %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'index' %}">Patients</a>
+                        <a class="nav-link" href="{% url 'patients_list' %}">Patients</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'index' %}">Clinicians</a>
+                        <a class="nav-link" href="{% url 'clinicians_list' %}">Clinicians</a>
                     </li>
                 {% elif user.role == "clinician" %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'index' %}">Patients</a>
+                        <a class="nav-link" href="{% url 'patients_list' %}">Patients</a>
                     </li>
                 {% elif user.role == "patient" %}
                     <li class="nav-item">
@@ -32,9 +32,10 @@
                         <a class="nav-link" href="{% url 'index' %}">Forms</a>
                     </li>
                 {% endif %}
+                <!--
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'index' %}">Account</a>
-                </li>
+                </li>-->
             </ul>
 
             <!-- Right logout -->

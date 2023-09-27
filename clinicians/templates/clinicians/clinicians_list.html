@@ -1,0 +1,34 @@
+{% extends "core/base.html" %}
+
+{% block title %}Patients{% endblock %}
+
+{% block content %}
+  <div class="container my-5">
+    <div>
+      <h1 class="display-4 fw-bold">Clinicians</h1>
+    </div>
+
+    <div class="my-4">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">Clinician</th>
+            <th scope="col">Patients</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for clinician, patients in clinicians_patients %}
+            <tr>
+              <td>{{ clinician }}</td>
+              <td>
+                {% for patient in patients %}
+                    <a href="{% url 'patient_details' pk=patient.user.id %}">{{ patient }}</a>{% if not forloop.last %},{% endif %} 
+                {% endfor %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
