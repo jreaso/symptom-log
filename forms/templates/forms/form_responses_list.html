@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container my-5">
     <div>
-        <h4 class="text-muted">{{ form_instance.patient }}</h4>
+        <h4 class="text-muted"><a href="{% url 'patient_details' pk=form_instance.patient.id %}" class="link-secondary">{{ form_instance.patient }}</a></h4>
         <h1 class="display-6 fw-bold">{{ form_instance.title }}</h1>
         <div class="mt-2">
           <!-- New Response Button -->
