@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden, Http404
 from .models import Form, FormResponse, Response, Question
 from .forms import SymptomScoreResponseForm, TextResponseForm, MultipleChoiceResponseForm, StatusResponseForm, EventResponseForm
 from django.contrib.auth.decorators import login_required
@@ -153,22 +153,27 @@ def delete_question_view(request, question_id, pk, form_id):
 def edit_question_view(request, question_id, pk, form_id):
     question = get_object_or_404(Question, id=question_id)
 
-    if request.method == 'POST':
-        question_title = request.POST.get('question_title')
-        question_label = request.POST.get('question_label')
-        
-        question.question_title = question_title
-        question.label = question_label
-        question.save()
+    if request.user.role == Account.Role.ADMIN:
 
-        if hasattr(question, 'statusquestion'):
-            status_question = question.statusquestion
-            option_0 = request.POST.get('option_0')
-            option_1 = request.POST.get('option_1')
+        if request.method == 'POST':
+            question_title = request.POST.get('question_title')
+            question_label = request.POST.get('question_label')
             
-            status_question.option_0 = option_0
-            status_question.option_1 = option_1
-            status_question.save()
+            question.question_title = question_title
+            question.label = question_label
+            question.save()
 
-        return redirect('edit_form', pk=pk, form_id=form_id)
+            if hasattr(question, 'statusquestion'):
+                status_question = question.statusquestion
+                option_0 = request.POST.get('option_0')
+                option_1 = request.POST.get('option_1')
+                
+                status_question.option_0 = option_0
+                status_question.option_1 = option_1
+                status_question.save()
+
+            return redirect('edit_form', pk=pk, form_id=form_id)
+        
+        return Http404()
+    return HttpResponseForbidden()
 
