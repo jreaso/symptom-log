@@ -39,11 +39,13 @@ def new_form_response_view(request, form_id, pk=None):
                     response_instance.save()
         
         else:
-            print(f"INVALID RESPONSE! {[response_form.is_valid() for response_form, question in response_forms_questions]}")
             raise ValidationError("Invalid Form Response")
 
         response_datetime_str = form_response.submitted_at.strftime('%Y%m%d%H%M%S')
-        return redirect('form_response', pk=form_response.form.patient.id, form_id=form_response.form.id, response_datetime=response_datetime_str)
+        if request.user.role == Account.Role.PATIENT:
+            return redirect('form_response_patient', form_id=form_response.form.id, response_datetime=response_datetime_str)
+        else:
+            return redirect('form_response', pk=form_response.form.patient.id, form_id=form_response.form.id, response_datetime=response_datetime_str)
     
     context = {
         'form_instance': form_instance,

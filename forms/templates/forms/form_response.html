@@ -5,10 +5,22 @@
 {% block content %}
 <div class="container my-5">
     <div>
-        <h4 class="text-muted"><a href="{% url 'patient_details' pk=form_instance.patient.id %}" class="link-secondary">{{ form_instance.patient }}</a></h4>
+        <h4 class="text-muted">
+            {% if patient_role %}
+                {{ form_instance.patient }}
+            {% else %}
+                <a href="{% url 'patient_details' pk=form_instance.patient.id %}" class="link-secondary">{{ form_instance.patient }}</a>
+            {% endif %}
+        </h4>
         <h1 class="display-6 fw-bold">{{ form_instance.title }}</h1>
         <h5 class="text-muted">{{ form_response.submitted_at  }} ({{ form_response.submitted_by }})</h5>
-        <h5 class="text-muted"><i class="fa fa-angle-left" aria-hidden="true"></i> <a href="{% url 'form_responses_list' pk=form_instance.patient.id form_id=form_instance.id %}" class="link-secondary">All Responses</a></h5>
+        <h5 class="text-muted"><i class="fa fa-angle-left" aria-hidden="true"></i> 
+            {% if patient_role %}
+                <a href="{% url 'form_responses_list_patient' form_id=form_instance.id %}" class="link-secondary">All Responses</a>
+            {% else %}
+                <a href="{% url 'form_responses_list' pk=form_instance.patient.id form_id=form_instance.id %}" class="link-secondary">All Responses</a></h5>
+            {% endif %}
+        </h5>
     </div>
 
     <div class="my-4">

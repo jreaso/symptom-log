@@ -10,9 +10,29 @@
     <tbody>
       {% for response in form_responses %}
         <tr>
-          <td><a href="{% url 'form_response' pk=response.form.patient.id form_id=response.form.id response_datetime=response.submitted_at|date:'YmdHis' %}">{{ response.submitted_at }}</a></td>
-          <td><a href="{% url 'form_responses_list' pk=response.form.patient.id form_id=response.form.id %}">{{ response.form.title }}</a></td>
-          <td><a href="{% url 'patient_details' pk=response.form.patient.id %}">{{ response.form.patient }}</a></td>
+          <td>
+            {% if patient_role %}
+              <a href="{% url 'form_response_patient' form_id=response.form.id response_datetime=response.submitted_at|date:'YmdHis' %}">
+            {% else %}
+              <a href="{% url 'form_response' pk=response.form.patient.id form_id=response.form.id response_datetime=response.submitted_at|date:'YmdHis' %}">
+            {% endif %}
+            {{ response.submitted_at }}</a>
+          </td>
+          <td>
+            {% if patient_role %}
+              <a href="{% url 'form_responses_list_patient' form_id=response.form.id %}">
+            {% else %}
+              <a href="{% url 'form_responses_list' pk=response.form.patient.id form_id=response.form.id %}">
+            {% endif %}
+            {{ response.form.title }}</a>
+          </td>
+          <td>
+            {% if patient_role %}
+              {{ response.form.patient }}
+            {% else %}
+              <a href="{% url 'patient_details' pk=response.form.patient.id %}">{{ response.form.patient }}</a>
+            {% endif %}
+          </td>
           <td>{{ response.submitted_by }} ({{ response.submitted_by.role }})</td>
         </tr>
       {% endfor %}

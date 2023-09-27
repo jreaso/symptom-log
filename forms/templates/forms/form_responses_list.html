@@ -5,19 +5,30 @@
 {% block content %}
 <div class="container my-5">
     <div>
-        <h4 class="text-muted"><a href="{% url 'patient_details' pk=form_instance.patient.id %}" class="link-secondary">{{ form_instance.patient }}</a></h4>
+      <h4 class="text-muted">
+          {% if patient_role %}
+              {{ form_instance.patient }}
+          {% else %}
+              <a href="{% url 'patient_details' pk=form_instance.patient.id %}" class="link-secondary">{{ form_instance.patient }}</a>
+          {% endif %}
+      </h4>
         <h1 class="display-6 fw-bold">{{ form_instance.title }}</h1>
         <div class="mt-2">
-          <!-- New Response Button -->
-          <a href="{% url 'new_form_response' pk=form_instance.patient.id form_id=form_instance.id %}"><button type="button" class="btn btn-success my-3">Submit New Response</button></a>
-          <!-- Edit Button -->
-          <a href="{% url 'edit_form' form_id=form_instance.id pk=form_instance.patient.id %}"><button type="button" class="btn btn-secondary my-3 mx-2">
-            <i class="fas fa-edit"></i> Edit Form
-          </button></a>
-          <!-- Delete Button -->
-          <button class="btn btn-danger deleteBtn" data-bs-toggle="modal" data-bs-target="#deleteModal" data-form-id="{{ form_instance.id }}">
-            <i class="fas fa-trash"></i> Delete
-          </button>
+          {% if patient_role %}
+            <!-- New Response Button -->
+            <a href="{% url 'new_form_response_patient' form_id=form_instance.id %}"><button type="button" class="btn btn-success my-3">Submit New Response</button></a>
+          {% else %}
+            <!-- New Response Button -->
+            <a href="{% url 'new_form_response' pk=form_instance.patient.id form_id=form_instance.id %}"><button type="button" class="btn btn-success my-3">Submit New Response</button></a>
+            <!-- Edit Button -->
+            <a href="{% url 'edit_form' form_id=form_instance.id pk=form_instance.patient.id %}"><button type="button" class="btn btn-secondary my-3 mx-2">
+              <i class="fas fa-edit"></i> Edit Form
+            </button></a>
+            <!-- Delete Button -->
+            <button class="btn btn-danger deleteBtn" data-bs-toggle="modal" data-bs-target="#deleteModal" data-form-id="{{ form_instance.id }}">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          {% endif %}
         </div>
     </div>
 

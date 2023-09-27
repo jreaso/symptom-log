@@ -1,7 +1,14 @@
 {% for form, last_response_datetime in patient_forms %}
   <div class="card my-3">
       <div class="card-body">
-        <h5 class="card-title"><a href="{% url 'form_responses_list' pk=patient.user.id form_id=form.id %}">{{ form.title}}</a></h5>
+        <h5 class="card-title">
+          {% if patient_role %}
+            <a href="{% url 'form_responses_list_patient' form_id=form.id %}">
+          {% else %}
+            <a href="{% url 'form_responses_list' pk=patient.user.id form_id=form.id %}">
+          {% endif %}
+          {{ form.title}}</a>
+        </h5>
         <h6 class="card-subtitle mb-2 text-muted">{{ form.patient }}</h6>
         <p class="card-text"></p><b>Last Response:</b> {{ last_response_datetime }}<br>
         <b>Number of Questions:</b> {{ form.questions.count }}<br>
