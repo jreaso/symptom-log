@@ -1,0 +1,20 @@
+{% extends "core/base.html" %}
+
+{% block title %}Patient Details - {{ patient }}{% endblock %}
+
+{% block content %}
+  <div class="container my-5">
+    <div>
+      <h1 class="display-4 fw-bold">Forms</h1>
+    </div>
+
+    {% include 'forms/forms_list.html' with patient=patient patient_forms=patient_forms %}
+
+    <div>
+      <h1>All Form Responses</h1>
+    </div>
+
+    {% include 'forms/form_responses_list_table.html' with form_responses=form_responses %}
+
+  </div>
+{% endblock %}

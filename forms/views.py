@@ -11,7 +11,9 @@ from .forms import CreateNewFormForm
 
 
 @login_required
-def new_form_response_view(request, pk, form_id):
+def new_form_response_view(request, form_id, pk=None):
+    if not pk:
+        pk = request.user.pk
     patient = get_object_or_404(Account, pk=pk)
     form_instance = get_object_or_404(Form, id=form_id, patient=patient)
 
@@ -74,7 +76,9 @@ def _get_form_for_question(question):
 
 
 @login_required
-def form_response_view(request, pk, form_id, response_datetime):
+def form_response_view(request, form_id, response_datetime, pk=None):
+    if not pk:
+        pk = request.user.pk
     patient = get_object_or_404(Account, pk=pk)
     form_instance = get_object_or_404(Form, id=form_id, patient=patient)
 
@@ -100,7 +104,9 @@ def form_response_view(request, pk, form_id, response_datetime):
 
 
 @login_required
-def form_responses_list_view(request, pk, form_id):
+def form_responses_list_view(request, form_id, pk=None):
+    if not pk:
+        pk = request.user.pk
     patient = get_object_or_404(Account, pk=pk)
     form_instance = get_object_or_404(Form, id=form_id, patient=patient)
 
@@ -222,3 +228,28 @@ def add_question_view(request, pk, form_id):
             EventQuestion.objects.create(**common_question_data)
 
     return redirect('edit_form', pk=pk, form_id=form_id)
+
+
+@login_required
+def forms_list_view(request):
+    forms = request.user.forms.all()
+    forms_details = []
+
+    for form in forms:
+        last_response = form.responses.order_by('-submitted_at').first()
+        last_response_date = last_response.submitted_at if last_response else None
+
+        forms_details.append((form, last_response_date))
+    
+    form_responses = FormResponse.objects.filter(form__patient=request.user).order_by('-submitted_at')
+
+    context = {
+        'patient': request.user.patient,
+        'patient_forms': forms_details,
+        'form_responses': form_responses
+    }
+
+    if request.user.role == Account.Role.PATIENT:
+        return render(request, "dashboard/patient_forms_list.html", context)
+    else:
+        return HttpResponseForbidden()

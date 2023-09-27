@@ -11,6 +11,6 @@ def index(request):
         return redirect('patients_list')
     
     elif request.user.role == Account.Role.PATIENT:
-        return HttpResponse("Patient Logged In")
+        return redirect('dashboard')
     
     return HttpResponse("Error: User does not have a role. Contact Admin.")

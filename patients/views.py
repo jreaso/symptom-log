@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, HttpResponse
 from django.core.exceptions import PermissionDenied
-from authuser.models import Account, Patient, Clinician
+from authuser.models import Account, Patient
 from forms.models import FormResponse
 
 
