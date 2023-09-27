@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden, Http404
-from .models import Form, FormResponse, Response, Question
+from .models import Form, FormResponse, Response, Question, StatusQuestion, MultipleChoiceQuestion, SymptomScoreQuestion, EventQuestion, TextQuestion
 from .forms import SymptomScoreResponseForm, TextResponseForm, MultipleChoiceResponseForm, StatusResponseForm, EventResponseForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
@@ -153,7 +153,7 @@ def delete_question_view(request, question_id, pk, form_id):
 def edit_question_view(request, question_id, pk, form_id):
     question = get_object_or_404(Question, id=question_id)
 
-    if request.user.role == Account.Role.ADMIN:
+    if request.user.role in (Account.Role.ADMIN, Account.Role.CLINICIAN):
 
         if request.method == 'POST':
             question_title = request.POST.get('question_title')
@@ -172,8 +172,46 @@ def edit_question_view(request, question_id, pk, form_id):
                 status_question.option_1 = option_1
                 status_question.save()
 
-            return redirect('edit_form', pk=pk, form_id=form_id)
-        
-        return Http404()
+        return redirect('edit_form', pk=pk, form_id=form_id)
+    
     return HttpResponseForbidden()
 
+
+@login_required
+def add_question_view(request, pk, form_id):
+    form_instance = get_object_or_404(Form, id=form_id)
+    
+    if request.method == 'POST':
+        question_type = request.POST.get('question_type')
+        question_title = request.POST.get('question_title')
+        label = request.POST.get('question_label')
+
+        last_question = Question.objects.filter(form=form_instance).order_by('-order').first()
+        order = last_question.order + 1 if last_question else 1
+        
+        common_question_data = {
+            'question_title': question_title,
+            'label': label,
+            'form': form_instance,
+            'order': order
+        }
+
+        if question_type == "MultipleChoice":
+            options = request.POST.get('options')
+            MultipleChoiceQuestion.objects.create(options=options, **common_question_data)
+
+        elif question_type == "Status":
+            option_0 = request.POST.get('option_0')
+            option_1 = request.POST.get('option_1')
+            StatusQuestion.objects.create(option_0=option_0, option_1=option_1, **common_question_data)
+
+        elif question_type == "SymptomScore":
+            SymptomScoreQuestion.objects.create(**common_question_data)
+
+        elif question_type == "Text":
+            TextQuestion.objects.create(**common_question_data)
+
+        elif question_type == "Event":
+            EventQuestion.objects.create(**common_question_data)
+
+    return redirect('edit_form', pk=pk, form_id=form_id)

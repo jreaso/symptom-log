@@ -77,11 +77,11 @@
                                 <small class="text-muted">Note: You can't edit the options after creating the question.</small>
                             {% elif question.statusquestion %}
                                 <div class="mb-3">
-                                    <label for="questionOption0_{{ question.id }}" class="form-label">Option 0</label>
+                                    <label for="questionOption0_{{ question.id }}" class="form-label">Status 0</label>
                                     <input type="text" class="form-control" id="questionOption0_{{ question.id }}" name="option_0" value="{{ question.statusquestion.option_0 }}">
                                 </div>
                                 <div class="mb-3">
-                                    <label for="questionOption1_{{ question.id }}" class="form-label">Option 1</label>
+                                    <label for="questionOption1_{{ question.id }}" class="form-label">Status 1</label>
                                     <input type="text" class="form-control" id="questionOption1_{{ question.id }}" name="option_1" value="{{ question.statusquestion.option_1 }}">
                                 </div>
                             {% endif %}
@@ -117,6 +117,92 @@
             </div>
         </div>
         {% endfor %}
+        <div class="d-flex justify-content-center align-items-center mt-4">
+            <button class="btn btn-success rounded-pill" data-bs-toggle="modal" data-bs-target="#addQuestionModal">
+                <i class="fas fa-plus"></i> Add New Question
+            </button>
+        </div>
     </div>
 </div>
+
+<!-- Add Question Modal -->
+<div class="modal fade" id="addQuestionModal" tabindex="-1" aria-labelledby="addQuestionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addQuestionModalLabel">Add New Question</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'add_question' pk=form_instance.patient.id form_id=form_instance.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Question Title Field -->
+                    <div class="mb-3">
+                        <label for="questionTitle" class="form-label">Question Title</label>
+                        <input type="text" class="form-control" id="questionTitle" name="question_title" required>
+                    </div>
+                    <!-- Label Field -->
+                    <div class="mb-3">
+                        <label for="questionLabel" class="form-label">Label</label>
+                        <input type="text" class="form-control" id="questionLabel" name="question_label">
+                    </div>
+                    <!-- Question Type Dropdown -->
+                    <div class="mb-3">
+                        <label for="questionType" class="form-label">Question Type</label>
+                        <select class="form-control" id="questionType" name="question_type" required>
+                            <option value="SymptomScore">Symptom Score</option>
+                            <option value="MultipleChoice">Multiple Choice</option>
+                            <option value="Event">Event</option>
+                            <option value="Status">Status</option>
+                            <option value="Text">Text</option>
+                        </select>
+                    </div>
+                    <!-- Multiple Choice Options -->
+                    <div class="mb-3 d-none" id="multipleChoiceOptions">
+                        <label for="options" class="form-label">Options</label>
+                        <input type="text" class="form-control" id="options" name="options">
+                        <small class="text-muted">Enter options as a comma-separated list.</small>
+                    </div>
+                    <!-- Status Fields -->
+                    <div class="mb-3 d-none" id="statusFields">
+                        <div class="mb-2">
+                            <label for="option_0" class="form-label">Status 0</label>
+                            <input type="text" class="form-control" id="option_0" name="option_0">
+                        </div>
+                        <div>
+                            <label for="option_1" class="form-label">Status 1</label>
+                            <input type="text" class="form-control" id="option_1" name="option_1">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Question</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("questionType").addEventListener("change", function() {
+        const multipleChoiceDiv = document.getElementById("multipleChoiceOptions");
+        const statusFieldsDiv = document.getElementById("statusFields");
+        
+        // Initially hide both sections
+        multipleChoiceDiv.classList.add("d-none");
+        statusFieldsDiv.classList.add("d-none");
+    
+        switch (this.value) {
+            case "MultipleChoice":
+                multipleChoiceDiv.classList.remove("d-none");
+                break;
+            case "Status":
+                statusFieldsDiv.classList.remove("d-none");
+                break;
+        }
+    });
+</script>
+    
+
 {% endblock %}
