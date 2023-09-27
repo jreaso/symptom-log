@@ -51,7 +51,8 @@ def new_form_response_view(request, form_id, pk=None):
             (question, form_class, form_instance) for question, (form_class, form_instance) in 
             [(q, _get_form_for_question(q)) for q in form_instance.questions.all().order_by('order')]
         ],
-        'user': request.user
+        'user': request.user,
+        'patient_role': (request.user.role == Account.Role.PATIENT)
     }
 
     return render(request, 'forms/form_response_new.html', context)
@@ -97,7 +98,8 @@ def form_response_view(request, form_id, response_datetime, pk=None):
         'form_instance': form_instance,
         'form_response': form_response,
         'question_responses': question_responses,
-        'user': request.user
+        'user': request.user,
+        'patient_role': (request.user.role == Account.Role.PATIENT)
     }
 
     return render(request, 'forms/form_response.html', context)
@@ -115,51 +117,64 @@ def form_responses_list_view(request, form_id, pk=None):
     context ={ 
         'form_instance': form_instance,
         'form_responses': form_responses,
-        'patient': patient
+        'patient': patient,
+        'patient_role': (request.user.role == Account.Role.PATIENT)
     }
     return render(request, 'forms/form_responses_list.html', context)
 
 @login_required
 def create_new_form(request, pk):
+    if request.user.role != Account.Role.PATIENT:
 
-    if request.method == 'POST':
-        form = CreateNewFormForm(request.POST)
-        if form.is_valid():
-            new_form = form.save(commit=False)
-            new_form.patient = Account.objects.get(id=pk)
-            new_form.save()
-            return redirect('form_responses_list', pk=pk, form_id=new_form.id)
-    
-    return redirect('patient_details', pk=pk)
+        if request.method == 'POST':
+            form = CreateNewFormForm(request.POST)
+            if form.is_valid():
+                new_form = form.save(commit=False)
+                new_form.patient = Account.objects.get(id=pk)
+                new_form.save()
+                return redirect('form_responses_list', pk=pk, form_id=new_form.id)
+        
+        return redirect('patient_details', pk=pk)
+    else:
+        raise PermissionError
 
 
 @login_required
 def delete_form_view(request, pk, form_id):
-    form = get_object_or_404(Form, id=form_id)
-    form.delete()
-    return redirect('patient_details', pk=pk)
+    if request.user.role != Account.Role.PATIENT:
+        form = get_object_or_404(Form, id=form_id)
+        form.delete()
+        return redirect('patient_details', pk=pk)
+    else:
+        raise PermissionError
 
 
 @login_required
 def edit_form_view(request, pk, form_id):
-    patient = get_object_or_404(Account, pk=pk)
-    form_instance = get_object_or_404(Form, id=form_id, patient=patient)
+    if request.user.role != Account.Role.PATIENT:
+        patient = get_object_or_404(Account, pk=pk)
+        form_instance = get_object_or_404(Form, id=form_id, patient=patient)
 
-    questions = form_instance.questions.all().order_by('order')
+        questions = form_instance.questions.all().order_by('order')
 
-    context = {
-        'form_instance': form_instance,
-        'questions': questions,
-    }
+        context = {
+            'form_instance': form_instance,
+            'questions': questions,
+        }
 
-    return render(request, 'forms/edit_form.html', context)
+        return render(request, 'forms/edit_form.html', context)
+    else:
+        raise PermissionError
 
 
 @login_required
 def delete_question_view(request, question_id, pk, form_id):
-    question = get_object_or_404(Question, id=question_id)
-    question.delete()
-    return redirect('edit_form', pk=pk, form_id=form_id)
+    if request.user.role != Account.Role.PATIENT:
+        question = get_object_or_404(Question, id=question_id)
+        question.delete()
+        return redirect('edit_form', pk=pk, form_id=form_id)
+    else:
+        raise PermissionError
 
 
 @login_required
@@ -192,42 +207,45 @@ def edit_question_view(request, question_id, pk, form_id):
 
 @login_required
 def add_question_view(request, pk, form_id):
-    form_instance = get_object_or_404(Form, id=form_id)
-    
-    if request.method == 'POST':
-        question_type = request.POST.get('question_type')
-        question_title = request.POST.get('question_title')
-        label = request.POST.get('question_label')
-
-        last_question = Question.objects.filter(form=form_instance).order_by('-order').first()
-        order = last_question.order + 1 if last_question else 1
+    if request.user.role != Account.Role.PATIENT:
+        form_instance = get_object_or_404(Form, id=form_id)
         
-        common_question_data = {
-            'question_title': question_title,
-            'label': label,
-            'form': form_instance,
-            'order': order
-        }
+        if request.method == 'POST':
+            question_type = request.POST.get('question_type')
+            question_title = request.POST.get('question_title')
+            label = request.POST.get('question_label')
 
-        if question_type == "MultipleChoice":
-            options = request.POST.get('options')
-            MultipleChoiceQuestion.objects.create(options=options, **common_question_data)
+            last_question = Question.objects.filter(form=form_instance).order_by('-order').first()
+            order = last_question.order + 1 if last_question else 1
+            
+            common_question_data = {
+                'question_title': question_title,
+                'label': label,
+                'form': form_instance,
+                'order': order
+            }
 
-        elif question_type == "Status":
-            option_0 = request.POST.get('option_0')
-            option_1 = request.POST.get('option_1')
-            StatusQuestion.objects.create(option_0=option_0, option_1=option_1, **common_question_data)
+            if question_type == "MultipleChoice":
+                options = request.POST.get('options')
+                MultipleChoiceQuestion.objects.create(options=options, **common_question_data)
 
-        elif question_type == "SymptomScore":
-            SymptomScoreQuestion.objects.create(**common_question_data)
+            elif question_type == "Status":
+                option_0 = request.POST.get('option_0')
+                option_1 = request.POST.get('option_1')
+                StatusQuestion.objects.create(option_0=option_0, option_1=option_1, **common_question_data)
 
-        elif question_type == "Text":
-            TextQuestion.objects.create(**common_question_data)
+            elif question_type == "SymptomScore":
+                SymptomScoreQuestion.objects.create(**common_question_data)
 
-        elif question_type == "Event":
-            EventQuestion.objects.create(**common_question_data)
+            elif question_type == "Text":
+                TextQuestion.objects.create(**common_question_data)
 
-    return redirect('edit_form', pk=pk, form_id=form_id)
+            elif question_type == "Event":
+                EventQuestion.objects.create(**common_question_data)
+
+        return redirect('edit_form', pk=pk, form_id=form_id)
+    else:
+        raise PermissionError
 
 
 @login_required
@@ -246,10 +264,13 @@ def forms_list_view(request):
     context = {
         'patient': request.user.patient,
         'patient_forms': forms_details,
-        'form_responses': form_responses
+        'form_responses': form_responses,
+        'patient_role': (request.user.role == Account.Role.PATIENT)
     }
 
     if request.user.role == Account.Role.PATIENT:
         return render(request, "dashboard/patient_forms_list.html", context)
     else:
         return HttpResponseForbidden()
+    
+    
