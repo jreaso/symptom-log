@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "authuser",
     "forms",
     "patients",
+    "clinicians",
 ]
 
 MIDDLEWARE = [
